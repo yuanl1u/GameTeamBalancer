@@ -14,7 +14,7 @@ def create_balanced_teams(selected_players):
     # 按加权胜率对玩家进行排序
     players_list = list(selected_players.items())
     random.shuffle(players_list)  # 每次随机排列顺序
-    sorted_players = sorted(players_list, key=lambda item: weighted_win_rate(item[1]), reverse=True)
+    sorted_players_by_pos = sorted(players_list, key = lambda item: len(item[1]["lane"]), reverse=False)
 
     # 初始化队伍和权重
     team1 = []
@@ -26,8 +26,12 @@ def create_balanced_teams(selected_players):
     team1_positions = {"上单": 0, "中单": 0, "打野": 0, "射手": 0, "辅助": 0}
     team2_positions = {"上单": 0, "中单": 0, "打野": 0, "射手": 0, "辅助": 0}
 
+    team1_players = set()
+    team2_players = set()
+    team1_wr = dict()
+    team2_wr = dict()
     # 将玩家分配到队伍中，同时考虑其首选位置并平衡位置
-    for player_name, player_data in sorted_players:
+    for player_name, player_data in sorted_players_by_pos:
         weight = weighted_win_rate(player_data)
         preferred_lanes = player_data["lane"]
         assigned = False
@@ -35,28 +39,62 @@ def create_balanced_teams(selected_players):
             # 检查两支队伍中是否已经有该位置
             if team1_positions[lane] < 1 and team2_positions[lane] < 1:
                 if team1_weight <= team2_weight:
-                    team1.append((player_name, player_data))
-                    team1_weight += weight
-                    team1_positions[lane] += 1
-                    assigned = True
+                    if weight > 55:
+                        team1.append((player_name, player_data))
+                        team1_weight += weight
+                        team1_positions[lane] += 1
+                        team1_players.add(player_name)
+                        team1_wr[player_name] = player_data["win_rate"]
+                    else:
+                        team2.append((player_name, player_data))
+                        team2_weight += weight
+                        team2_positions[lane] += 1
+                        team2_players.add(player_name)
+                        team2_wr[player_name] = player_data["win_rate"]
                 else:
-                    team2.append((player_name, player_data))
-                    team2_weight += weight
-                    team2_positions[lane] += 1
-                    assigned = True
+                    if weight > 55:
+                        team2.append((player_name, player_data))
+                        team2_weight += weight
+                        team2_positions[lane] += 1
+                        team2_players.add(player_name)
+                        team2_wr[player_name] = player_data["win_rate"]
+                    else:
+                        team1.append((player_name, player_data))
+                        team1_weight += weight
+                        team1_positions[lane] += 1
+                        team1_players.add(player_name)
+                        team1_wr[player_name] = player_data["win_rate"]
+                assigned = True
                 break
         # 如果无法按照首选位置分配，则根据先前的逻辑进行分配
         if not assigned:
             if team1_weight <= team2_weight:
-                team1.append((player_name, player_data))
-                team1_weight += weight
+                if weight > 55:
+                    team1.append((player_name, player_data))
+                    team1_weight += weight
+                    team1_positions[lane] += 1
+                    team1_players.add(player_name)
+                    team1_wr[player_name] = player_data["win_rate"]
+                else:
+                    team2.append((player_name, player_data))
+                    team2_weight += weight
+                    team2_positions[lane] += 1
+                    team2_players.add(player_name)
+                    team2_wr[player_name] = player_data["win_rate"]
             else:
-                team2.append((player_name, player_data))
-                team2_weight += weight
-
+                if weight > 55:
+                    team2.append((player_name, player_data))
+                    team2_weight += weight
+                    team2_positions[lane] += 1
+                    team2_players.add(player_name)
+                    team2_wr[player_name] = player_data["win_rate"]
+                else:
+                    team1.append((player_name, player_data))
+                    team1_weight += weight
+                    team1_positions[lane] += 1
+                    team1_players.add(player_name)
+                    team1_wr[player_name] = player_data["win_rate"]
     return team1, team2
-
-
 def update_player_stats(players, team, is_winner):
     for player_name, player_data in team:
         total_games = players[player_name]["games"]
