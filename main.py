@@ -2,25 +2,23 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter.ttk import Treeview, Scrollbar, Style
 import json
-import math
+
+kPowerThreshold = 55
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
     team.append((player_name, player_data))
-    team_weight = (team_weight + weight) / len(team)
+    team_weight = team_weight + weight
     team_positions[lane] += 1
     return team, team_weight, team_positions
-
 
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
-    if player_name == "香克斯" or player_name == "木守宫":
+    if player_name == "香克斯":
         return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
-    elif  player_name == "小超梦":
-        return "木守宫" not in team_players
     return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
@@ -44,8 +42,17 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
         print(player_name, weight, "team1-1")
         return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
 
-    if team1_weight <= team2_weight:
-        if weight > 55:
+    team1_avg = 0
+    team2_avg = 0
+    if len(team1) != 0:
+        team1_avg = team1_weight / len(team1)
+    if len(team2) != 0:
+        team2_avg = team2_weight / len(team2)
+
+    # team1 弱于 team2, 则优先将上等马分给 team1; 中/下等马分给 team2
+    if team1_avg < team2_avg:
+        print("team1:", team1_avg, "team2:", team2_avg)
+        if weight > kPowerThreshold:
             team1, team1_weight, team1_positions = (
                 team_addition(team1, team1_weight, team1_positions,
                               weight, lane, player_name, player_data))
@@ -57,8 +64,9 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
                               weight, lane, player_name, player_data))
             team2_players.append(player_name)
             print(player_name, weight, "team2-2")
-    elif team1_weight > team2_weight:
-        if weight > 55:
+    else:
+        print("team1:", team1_avg, "team2:", team2_avg)
+        if weight > kPowerThreshold:
             team2, team2_weight, team2_positions = (
                 team_addition(team2, team2_weight, team2_positions,
                               weight, lane, player_name, player_data))
@@ -77,8 +85,10 @@ def create_balanced_teams(selected_players):
     def weighted_win_rate(player):
         return player["win_rate"]
     players_list = list(selected_players.items())
+    # 将玩家按照其位置多样性升序，保证只玩一个位置的玩家可以优先被考虑；
+    # 在位置数量一样的情况下，按胜率降序，保证强的选手可以优先被考虑
     sorted_players_by_pos =\
-        sorted(players_list, key=lambda item: (len(item[1]["lane"]), weighted_win_rate(item[1])), reverse=False)
+        sorted(players_list, key=lambda item: (len(item[1]["lane"]), -weighted_win_rate(item[1])), reverse=False)
     # 初始化队伍和权重
     team1 = []
     team2 = []
@@ -97,13 +107,29 @@ def create_balanced_teams(selected_players):
         preferred_lanes = player_data["lane"]
         assigned = False
         for lane in preferred_lanes:
-            # 检查两支队伍中是否均缺少该位置
+            # 双方队伍都缺少该位置的情况
             if team1_positions[lane] < 1 and team2_positions[lane] < 1:
                 (team1, team1_weight, team1_positions,
                  team2, team2_weight, team2_positions) = (
                     team_assignment(team1, team1_weight, team1_positions, team1_players,
                                     team2, team2_weight, team2_positions, team2_players,
                                     weight, lane, player_name, player_data))
+                assigned = True
+                break
+            elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
+                team1, team1_weight, team1_positions = (
+                    team_addition(team1, team1_weight, team1_positions,
+                                  weight, lane, player_name, player_data))
+                team1_players.append(player_name)
+                print(player_name, weight, "team1-4")
+                assigned = True
+                break
+            elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
+                team2, team2_weight, team2_positions = (
+                    team_addition(team2, team2_weight, team2_positions,
+                                  weight, lane, player_name, player_data))
+                team2_players.append(player_name)
+                print(player_name, weight, "team2-4")
                 assigned = True
                 break
         # 如果无法按照首选位置分配，则根据先前的逻辑进行分配
@@ -115,19 +141,16 @@ def create_balanced_teams(selected_players):
                                 weight, lane, player_name, player_data))
     return team1, team2
 
-
 def update_player_stats(players, player_name, is_winner):
     player_data = players[player_name]
     total_games = player_data["games"]
     wins = player_data["win"]
     loses = player_data["loss"]
-
     total_games += 1
     if is_winner:
         wins += 1
     else:
         loses += 1
-
     new_win_rate = (wins / total_games) * 100
     player_data["games"] = total_games
     player_data["win_rate"] = round(new_win_rate, 2)
