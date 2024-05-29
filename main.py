@@ -3,7 +3,69 @@ from tkinter import messagebox
 from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 import math
-import random
+
+
+def team_addition(team, team_weight, team_positions,
+                  weight, lane, player_name, player_data):
+    team.append((player_name, player_data))
+    team_weight = team_weight + weight
+    team_positions[lane] += 1
+    return team, team_weight, team_positions
+
+
+def he_can_be_added(player_name, team_players):
+    if player_name == "香克斯":
+        return "小超梦" not in team_players and "大师" not in team_players
+    elif player_name == "基拉祈" or player_name == "鸡":
+        return "严酷训诫" not in team_players
+    else:
+        return True
+
+
+def team_assignment(team1, team1_weight, team1_positions, team1_players,
+                    team2, team2_weight, team2_positions, team2_players,
+                    weight, lane, player_name, player_data):
+    # Pre-check those who do not want in the same team
+    if not he_can_be_added(player_name, team1_players):
+        team2, team2_weight, team2_positions = (
+            team_addition(team2, team2_weight, team2_positions,
+                          weight, lane, player_name, player_data))
+        team2_players.append(player_name)
+        print(player_name, "team2-1")
+    elif not he_can_be_added(player_name, team2_players):
+        team1, team1_weight, team1_positions = (
+            team_addition(team1, team1_weight, team1_positions,
+                          weight, lane, player_name, player_data))
+        team1_players.append(player_name)
+        print(player_name, "team1-1")
+    elif team1_weight <= team2_weight:
+        if weight > 55:
+            team1, team1_weight, team1_positions = (
+                team_addition(team1, team1_weight, team1_positions,
+                              weight, lane, player_name, player_data))
+            team1_players.append(player_name)
+            print(player_name, "team1-2")
+        else:
+            team2, team2_weight, team2_positions = (
+                team_addition(team2, team2_weight, team2_positions,
+                              weight, lane, player_name, player_data))
+            team2_players.append(player_name)
+            print(player_name, "team2-2")
+    elif team1_weight > team2_weight:
+        if weight > 55:
+            team2, team2_weight, team2_positions = (
+                team_addition(team2, team2_weight, team2_positions,
+                              weight, lane, player_name, player_data))
+            team2_players.append(player_name)
+            print(player_name, "team2-3")
+        else:
+            team1, team1_weight, team1_positions = (
+                team_addition(team1, team1_weight, team1_positions,
+                              weight, lane, player_name, player_data))
+            team1_players.append(player_name)
+            print(player_name, "team1-3")
+    return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+
 
 def create_balanced_teams(selected_players):
     # 计算加权胜率，并减少游戏数的影响
@@ -12,9 +74,7 @@ def create_balanced_teams(selected_players):
 
     # 按加权胜率对玩家进行排序
     players_list = list(selected_players.items())
-    random.shuffle(players_list)  # 每次随机排列顺序
-    sorted_players_by_pos = sorted(players_list, key = lambda item: len(item[1]["lane"]), reverse=False)
-
+    sorted_players_by_pos = sorted(players_list, key=lambda item: len(item[1]["lane"]), reverse=False)
     # 初始化队伍和权重
     team1 = []
     team2 = []
@@ -25,89 +85,51 @@ def create_balanced_teams(selected_players):
     team1_positions = {"上单": 0, "中单": 0, "打野": 0, "射手": 0, "辅助": 0}
     team2_positions = {"上单": 0, "中单": 0, "打野": 0, "射手": 0, "辅助": 0}
 
-    team1_players = set()
-    team2_players = set()
-    team1_wr = dict()
-    team2_wr = dict()
+    team1_players = []
+    team2_players = []
     # 将玩家分配到队伍中，同时考虑其首选位置并平衡位置
     for player_name, player_data in sorted_players_by_pos:
         weight = weighted_win_rate(player_data)
         preferred_lanes = player_data["lane"]
         assigned = False
         for lane in preferred_lanes:
-            # 检查两支队伍中是否已经有该位置
+            # 检查两支队伍中是否均缺少该位置
             if team1_positions[lane] < 1 and team2_positions[lane] < 1:
-                if team1_weight <= team2_weight:
-                    if weight > 55:
-                        team1.append((player_name, player_data))
-                        team1_weight += weight
-                        team1_positions[lane] += 1
-                        team1_players.add(player_name)
-                        team1_wr[player_name] = player_data["win_rate"]
-                    else:
-                        team2.append((player_name, player_data))
-                        team2_weight += weight
-                        team2_positions[lane] += 1
-                        team2_players.add(player_name)
-                        team2_wr[player_name] = player_data["win_rate"]
-                else:
-                    if weight > 55:
-                        team2.append((player_name, player_data))
-                        team2_weight += weight
-                        team2_positions[lane] += 1
-                        team2_players.add(player_name)
-                        team2_wr[player_name] = player_data["win_rate"]
-                    else:
-                        team1.append((player_name, player_data))
-                        team1_weight += weight
-                        team1_positions[lane] += 1
-                        team1_players.add(player_name)
-                        team1_wr[player_name] = player_data["win_rate"]
+                (team1, team1_weight, team1_positions,
+                 team2, team2_weight, team2_positions) = (
+                    team_assignment(team1, team1_weight, team1_positions, team1_players,
+                                    team2, team2_weight, team2_positions, team2_players,
+                                    weight, lane, player_name, player_data))
                 assigned = True
                 break
         # 如果无法按照首选位置分配，则根据先前的逻辑进行分配
         if not assigned:
-            if team1_weight <= team2_weight:
-                if weight > 55:
-                    team1.append((player_name, player_data))
-                    team1_weight += weight
-                    team1_positions[lane] += 1
-                    team1_players.add(player_name)
-                    team1_wr[player_name] = player_data["win_rate"]
-                else:
-                    team2.append((player_name, player_data))
-                    team2_weight += weight
-                    team2_positions[lane] += 1
-                    team2_players.add(player_name)
-                    team2_wr[player_name] = player_data["win_rate"]
-            else:
-                if weight > 55:
-                    team2.append((player_name, player_data))
-                    team2_weight += weight
-                    team2_positions[lane] += 1
-                    team2_players.add(player_name)
-                    team2_wr[player_name] = player_data["win_rate"]
-                else:
-                    team1.append((player_name, player_data))
-                    team1_weight += weight
-                    team1_positions[lane] += 1
-                    team1_players.add(player_name)
-                    team1_wr[player_name] = player_data["win_rate"]
+            (team1, team1_weight, team1_positions,
+             team2, team2_weight, team2_positions) = (
+                team_assignment(team1, team1_weight, team1_positions, team1_players,
+                                team2, team2_weight, team2_positions, team2_players,
+                                weight, lane, player_name, player_data))
     return team1, team2
+
 
 def update_player_stats(players, player_name, is_winner):
     player_data = players[player_name]
     total_games = player_data["games"]
-    win_rate = player_data["win_rate"]
-    wins = round(win_rate * total_games / 100)
+    wins = player_data["wins"]
+    loses = player_data["loss"]
 
     total_games += 1
     if is_winner:
         wins += 1
+    else:
+        loses += 1
 
     new_win_rate = (wins / total_games) * 100
     player_data["games"] = total_games
     player_data["win_rate"] = round(new_win_rate, 2)
+    player_data["wins"] = wins
+    player_data["loss"] = loses
+
 
 def load_players_data(filename="players_data.json"):
     try:
@@ -118,15 +140,17 @@ def load_players_data(filename="players_data.json"):
         print("File not found.")
         return None
 
+
 def save_players_data(players, filename="players_data.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
+
 
 class TeamBalancerApp:
     def __init__(self, root, players):
         self.root = root
         self.players = players
-        
+
         # Set style for Treeview
         style = Style()
         style.configure("Treeview", rowheight=30)  # Adjust row height
@@ -136,7 +160,7 @@ class TeamBalancerApp:
         self.title_label = tk.Label(root, text="请选择本次参与游戏的10人")
         self.title_label.pack()
 
-        self.player_tree = Treeview(root, columns=("Name", "WinRate", "Games"), show='headings', height = 15)
+        self.player_tree = Treeview(root, columns=("Name", "WinRate", "Games"), show='headings', height=15)
         self.player_tree.heading("Name", text="名字", anchor='center')
         self.player_tree.heading("WinRate", text="胜率", anchor='center')
         self.player_tree.heading("Games", text="总游戏数", anchor='center')
@@ -161,7 +185,7 @@ class TeamBalancerApp:
         self.team1_label = tk.Label(root, text="Team 1")
         self.team2_label = tk.Label(root, text="Team 2")
         self.team1_listbox = tk.Listbox(root, width=27, height=8)  # Set the width and height of the Listbox
-        self.team2_listbox = tk.Listbox(root, width=27, height=8) 
+        self.team2_listbox = tk.Listbox(root, width=27, height=8)
         self.balance_button = tk.Button(root, text="平衡分队", command=self.balance_teams)
         self.balance_button.pack()
 
@@ -172,7 +196,8 @@ class TeamBalancerApp:
 
     def populate_player_tree(self):
         for player_name, player_data in sorted(self.players.items(), key=lambda item: -item[1]['win_rate']):
-            self.player_tree.insert("", tk.END, values=(player_name, f"{player_data['win_rate']}%", player_data["games"]))
+            self.player_tree.insert("", tk.END,
+                                    values=(player_name, f"{player_data['win_rate']}%", player_data["games"]))
 
     def toggle_selection(self, event):
         region = self.player_tree.identify("region", event.x, event.y)
@@ -203,17 +228,21 @@ class TeamBalancerApp:
             messagebox.showerror("错误", "请选择10名玩家进行游戏")
             return
 
-        selected_players = {self.player_tree.item(i, 'values')[0]: self.players[self.player_tree.item(i, 'values')[0]] for i in selected_items}
+        selected_players = {self.player_tree.item(i, 'values')[0]: self.players[self.player_tree.item(i, 'values')[0]]
+                            for i in selected_items}
         team1, team2 = create_balanced_teams(selected_players)
 
         self.team1_listbox.delete(0, tk.END)
         self.team2_listbox.delete(0, tk.END)
 
         for player_name, player_data in team1:
-            self.team1_listbox.insert(tk.END, f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
+            self.team1_listbox.insert(tk.END,
+                                      f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
 
         for player_name, player_data in team2:
-            self.team2_listbox.insert(tk.END, f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
+            self.team2_listbox.insert(tk.END,
+                                      f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
+
 
 if __name__ == "__main__":
     players = load_players_data() or {}
