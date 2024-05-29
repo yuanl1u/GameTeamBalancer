@@ -8,62 +8,67 @@ import math
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
     team.append((player_name, player_data))
-    team_weight = team_weight + weight
+    team_weight = (team_weight + weight) / len(team)
     team_positions[lane] += 1
     return team, team_weight, team_positions
 
 
 def he_can_be_added(player_name, team_players):
+    if len(team_players) == 5:
+        return False
     if player_name == "香克斯":
-        return "小超梦" not in team_players and "大师" not in team_players
+        return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
-    else:
-        return True
-
+    return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
                     team2, team2_weight, team2_positions, team2_players,
                     weight, lane, player_name, player_data):
     # Pre-check those who do not want in the same team
-    if not he_can_be_added(player_name, team1_players):
+    if not he_can_be_added(player_name, team1_players) and \
+            he_can_be_added(player_name, team2_players):
         team2, team2_weight, team2_positions = (
             team_addition(team2, team2_weight, team2_positions,
                           weight, lane, player_name, player_data))
         team2_players.append(player_name)
-        print(player_name, "team2-1")
-    elif not he_can_be_added(player_name, team2_players):
+        print(player_name, weight, "team2-1")
+        return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+    elif not he_can_be_added(player_name, team2_players) and \
+            he_can_be_added(player_name, team1_players):
         team1, team1_weight, team1_positions = (
             team_addition(team1, team1_weight, team1_positions,
                           weight, lane, player_name, player_data))
         team1_players.append(player_name)
-        print(player_name, "team1-1")
-    elif team1_weight <= team2_weight:
-        if weight > 55:
+        print(player_name, weight, "team1-1")
+        return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+
+    if team1_weight <= team2_weight:
+        if len(team2_players) - len(team1_players) > 1 or weight > 225:
             team1, team1_weight, team1_positions = (
                 team_addition(team1, team1_weight, team1_positions,
                               weight, lane, player_name, player_data))
             team1_players.append(player_name)
-            print(player_name, "team1-2")
+            print(player_name, weight, "team1-2")
         else:
             team2, team2_weight, team2_positions = (
                 team_addition(team2, team2_weight, team2_positions,
                               weight, lane, player_name, player_data))
             team2_players.append(player_name)
-            print(player_name, "team2-2")
+            print(player_name, weight, "team2-2")
     elif team1_weight > team2_weight:
-        if weight > 55:
+        if len(team1_players) - len(team2_players) > 1 or weight > 225:
             team2, team2_weight, team2_positions = (
                 team_addition(team2, team2_weight, team2_positions,
                               weight, lane, player_name, player_data))
             team2_players.append(player_name)
-            print(player_name, "team2-3")
+            print(player_name, weight, "team2-3")
         else:
             team1, team1_weight, team1_positions = (
                 team_addition(team1, team1_weight, team1_positions,
                               weight, lane, player_name, player_data))
             team1_players.append(player_name)
-            print(player_name, "team1-3")
+            print(player_name, weight, "team1-3")
     return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
 
 
@@ -74,7 +79,8 @@ def create_balanced_teams(selected_players):
 
     # 按加权胜率对玩家进行排序
     players_list = list(selected_players.items())
-    sorted_players_by_pos = sorted(players_list, key=lambda item: len(item[1]["lane"]), reverse=False)
+    sorted_players_by_pos =\
+        sorted(players_list, key=lambda item: (len(item[1]["lane"]), -weighted_win_rate(item[1])), reverse=False)
     # 初始化队伍和权重
     team1 = []
     team2 = []
