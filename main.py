@@ -119,7 +119,7 @@ def create_balanced_teams(selected_players):
 def update_player_stats(players, player_name, is_winner):
     player_data = players[player_name]
     total_games = player_data["games"]
-    wins = player_data["wins"]
+    wins = player_data["win"]
     loses = player_data["loss"]
 
     total_games += 1
@@ -131,7 +131,7 @@ def update_player_stats(players, player_name, is_winner):
     new_win_rate = (wins / total_games) * 100
     player_data["games"] = total_games
     player_data["win_rate"] = round(new_win_rate, 2)
-    player_data["wins"] = wins
+    player_data["win"] = wins
     player_data["loss"] = loses
 
 
