@@ -4,7 +4,6 @@ from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 import math
 
-
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
     team.append((player_name, player_data))
@@ -16,10 +15,12 @@ def team_addition(team, team_weight, team_positions,
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
-    if player_name == "香克斯":
+    if player_name == "香克斯" or player_name == "木守宫":
         return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
+    elif  player_name == "小超梦":
+        return "木守宫" not in team_players
     return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
@@ -44,7 +45,7 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
         return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
 
     if team1_weight <= team2_weight:
-        if len(team2_players) - len(team1_players) > 1 or weight > 225:
+        if weight > 55:
             team1, team1_weight, team1_positions = (
                 team_addition(team1, team1_weight, team1_positions,
                               weight, lane, player_name, player_data))
@@ -57,7 +58,7 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
             team2_players.append(player_name)
             print(player_name, weight, "team2-2")
     elif team1_weight > team2_weight:
-        if len(team1_players) - len(team2_players) > 1 or weight > 225:
+        if weight > 55:
             team2, team2_weight, team2_positions = (
                 team_addition(team2, team2_weight, team2_positions,
                               weight, lane, player_name, player_data))
@@ -73,14 +74,11 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
 
 
 def create_balanced_teams(selected_players):
-    # 计算加权胜率，并减少游戏数的影响
     def weighted_win_rate(player):
-        return player["win_rate"] * math.log(player["games"] + 1)  # 使用对数减少游戏数的影响
-
-    # 按加权胜率对玩家进行排序
+        return player["win_rate"]
     players_list = list(selected_players.items())
     sorted_players_by_pos =\
-        sorted(players_list, key=lambda item: (len(item[1]["lane"]), -weighted_win_rate(item[1])), reverse=False)
+        sorted(players_list, key=lambda item: (len(item[1]["lane"]), weighted_win_rate(item[1])), reverse=False)
     # 初始化队伍和权重
     team1 = []
     team2 = []
