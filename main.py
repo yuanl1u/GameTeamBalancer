@@ -10,7 +10,7 @@ def team_addition(team, team_weight, team_positions,
     team.append((player_name, player_data))
     team_weight = team_weight + weight
     team_positions[lane] += 1
-    return team, team_weight, team_positions
+    return team_weight
 
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
@@ -27,20 +27,18 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
     # Pre-check those who do not want in the same team
     if not he_can_be_added(player_name, team1_players) and \
             he_can_be_added(player_name, team2_players):
-        team2, team2_weight, team2_positions = (
-            team_addition(team2, team2_weight, team2_positions,
-                          weight, lane, player_name, player_data))
+        team2_weight = team_addition(team2, team2_weight, team2_positions,
+                                     weight, lane, player_name, player_data)
         team2_players.append(player_name)
         print(player_name, weight, "team2-1")
-        return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+        return team1_weight, team2_weight
     elif not he_can_be_added(player_name, team2_players) and \
             he_can_be_added(player_name, team1_players):
-        team1, team1_weight, team1_positions = (
-            team_addition(team1, team1_weight, team1_positions,
-                          weight, lane, player_name, player_data))
+        team1_weight = team_addition(team1, team1_weight, team1_positions,
+                                     weight, lane, player_name, player_data)
         team1_players.append(player_name)
         print(player_name, weight, "team1-1")
-        return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+        return team1_weight, team2_weight
 
     team1_avg = 0
     team2_avg = 0
@@ -53,32 +51,28 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
     if team1_avg < team2_avg:
         print("team1:", team1_avg, "team2:", team2_avg)
         if weight > kPowerThreshold:
-            team1, team1_weight, team1_positions = (
-                team_addition(team1, team1_weight, team1_positions,
-                              weight, lane, player_name, player_data))
+            team1_weight = team_addition(team1, team1_weight, team1_positions,
+                                         weight, lane, player_name, player_data)
             team1_players.append(player_name)
             print(player_name, weight, "team1-2")
         else:
-            team2, team2_weight, team2_positions = (
-                team_addition(team2, team2_weight, team2_positions,
-                              weight, lane, player_name, player_data))
+            team2_weight = team_addition(team2, team2_weight, team2_positions,
+                                         weight, lane, player_name, player_data)
             team2_players.append(player_name)
             print(player_name, weight, "team2-2")
     else:
         print("team1:", team1_avg, "team2:", team2_avg)
         if weight > kPowerThreshold:
-            team2, team2_weight, team2_positions = (
-                team_addition(team2, team2_weight, team2_positions,
-                              weight, lane, player_name, player_data))
+            team2_weight = team_addition(team2, team2_weight, team2_positions,
+                                         weight, lane, player_name, player_data)
             team2_players.append(player_name)
             print(player_name, weight, "team2-3")
         else:
-            team1, team1_weight, team1_positions = (
-                team_addition(team1, team1_weight, team1_positions,
-                              weight, lane, player_name, player_data))
+            team1_weight = team_addition(team1, team1_weight, team1_positions,
+                                         weight, lane, player_name, player_data)
             team1_players.append(player_name)
             print(player_name, weight, "team1-3")
-    return team1, team1_weight, team1_positions, team2, team2_weight, team2_positions
+    return team1_weight, team2_weight
 
 
 def create_balanced_teams(selected_players):
@@ -109,36 +103,32 @@ def create_balanced_teams(selected_players):
         for lane in preferred_lanes:
             # 双方队伍都缺少该位置的情况
             if team1_positions[lane] < 1 and team2_positions[lane] < 1:
-                (team1, team1_weight, team1_positions,
-                 team2, team2_weight, team2_positions) = (
+                team1_weight, team2_weight =\
                     team_assignment(team1, team1_weight, team1_positions, team1_players,
                                     team2, team2_weight, team2_positions, team2_players,
-                                    weight, lane, player_name, player_data))
+                                    weight, lane, player_name, player_data)
                 assigned = True
                 break
             elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                team1, team1_weight, team1_positions = (
-                    team_addition(team1, team1_weight, team1_positions,
-                                  weight, lane, player_name, player_data))
+                team1_weight = team_addition(team1, team1_weight, team1_positions,
+                                             weight, lane, player_name, player_data)
                 team1_players.append(player_name)
                 print(player_name, weight, "team1-4")
                 assigned = True
                 break
             elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                team2, team2_weight, team2_positions = (
-                    team_addition(team2, team2_weight, team2_positions,
-                                  weight, lane, player_name, player_data))
+                team2_weight = team_addition(team2, team2_weight, team2_positions,
+                                  weight, lane, player_name, player_data)
                 team2_players.append(player_name)
                 print(player_name, weight, "team2-4")
                 assigned = True
                 break
         # 如果无法按照首选位置分配，则根据先前的逻辑进行分配
         if not assigned:
-            (team1, team1_weight, team1_positions,
-             team2, team2_weight, team2_positions) = (
+            team1_weight, team2_weight =\
                 team_assignment(team1, team1_weight, team1_positions, team1_players,
                                 team2, team2_weight, team2_positions, team2_players,
-                                weight, lane, player_name, player_data))
+                                weight, lane, player_name, player_data)
     return team1, team2
 
 def update_player_stats(players, player_name, is_winner):
