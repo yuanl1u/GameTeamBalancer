@@ -81,7 +81,6 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
             print(player_name, lane, weight, "team1-3")
     return team1_weight, team2_weight
 
-
 def create_balanced_teams(selected_players):
     def weighted_win_rate(player):
         return player["win_rate"]
@@ -155,7 +154,6 @@ def update_player_stats(players, player_name, is_winner):
     player_data["win"] = wins
     player_data["loss"] = loses
 
-
 def load_players_data(filename="players_data.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
@@ -169,7 +167,6 @@ def load_players_data(filename="players_data.json"):
 def save_players_data(players, filename="players_data.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
-
 
 class TeamBalancerApp:
     def __init__(self, root, players):
@@ -267,7 +264,6 @@ class TeamBalancerApp:
         for player_name, player_data in team2:
             self.team2_listbox.insert(tk.END,
                                       f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
-
 
 if __name__ == "__main__":
     players = load_players_data() or {}
