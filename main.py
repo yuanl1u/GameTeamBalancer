@@ -154,7 +154,7 @@ def update_player_stats(players, player_name, is_winner):
     player_data["win"] = wins
     player_data["loss"] = loses
 
-def load_players_data(filename="total_data.json"):
+def load_players_data(filename="players_data.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
             players = json.load(file)
@@ -164,7 +164,7 @@ def load_players_data(filename="total_data.json"):
         return None
 
 
-def save_players_data(players, filename="total_data.json"):
+def save_players_data(players, filename="players_data.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
 
@@ -175,20 +175,20 @@ class TeamBalancerApp:
 
         # Set style for Treeview
         style = Style()
-        style.configure("Treeview", rowheight=30)  # Adjust row height
+        style.configure("Treeview", rowheight=30)
         style.configure("Treeview.Heading", font=('Arial', 12, 'bold'))
         style.configure("Treeview", font=('Arial', 11))
 
         self.title_label = tk.Label(root, text="请选择本次参与游戏的10人")
         self.title_label.pack()
 
-        self.player_tree = Treeview(root, columns=("Name", "WinRate", "Games"), show='headings', height=15)
+        self.player_tree = Treeview(root, columns=("Name", "WinRate", "Games"), show='headings', height=20)
         self.player_tree.heading("Name", text="名字", anchor='center')
         self.player_tree.heading("WinRate", text="胜率", anchor='center')
         self.player_tree.heading("Games", text="总游戏数", anchor='center')
-        self.player_tree.column("Name", width=100, anchor='center')  # Set the width of the Name column
-        self.player_tree.column("WinRate", width=100, anchor='center')  # Set the width of the WinRate column
-        self.player_tree.column("Games", width=100, anchor='center')  # Set the width of the Games column
+        self.player_tree.column("Name", width=100, anchor='center')
+        self.player_tree.column("WinRate", width=100, anchor='center')
+        self.player_tree.column("Games", width=100, anchor='center')
         self.player_tree['selectmode'] = 'extended'
         self.populate_player_tree()
 
@@ -206,7 +206,7 @@ class TeamBalancerApp:
 
         self.team1_label = tk.Label(root, text="Team 1")
         self.team2_label = tk.Label(root, text="Team 2")
-        self.team1_listbox = tk.Listbox(root, width=27, height=8)  # Set the width and height of the Listbox
+        self.team1_listbox = tk.Listbox(root, width=27, height=8)
         self.team2_listbox = tk.Listbox(root, width=27, height=8)
         self.balance_button = tk.Button(root, text="平衡分队", command=self.balance_teams)
         self.balance_button.pack()
