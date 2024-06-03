@@ -4,14 +4,14 @@ from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 
 # 55及以上为上等马
-# 50-55为中等马
-# 50以下为下等马
+# 45-55为中等马
+# 45以下为下等马
 kPowerThreshold = 55
-kNormalThreshold = 50
+kNormalThreshold = 45
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
-    team.append((player_name, player_data))
+    team.append((player_name, player_data, lane))
     team_weight = team_weight + weight
     team_positions[lane] += 1
     return team_weight
@@ -23,6 +23,8 @@ def he_can_be_added(player_name, team_players):
         return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
+    elif player_name == "杰尼龟":
+        return "c罗" not in team_players
     return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
@@ -257,13 +259,18 @@ class TeamBalancerApp:
         self.team1_listbox.delete(0, tk.END)
         self.team2_listbox.delete(0, tk.END)
 
-        for player_name, player_data in team1:
-            self.team1_listbox.insert(tk.END,
-                                      f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
+    # 按位置排序
+        positions_order = ["上单", "打野", "中单", "射手", "辅助"]
+        sorted_team1 = sorted(team1, key=lambda x: positions_order.index(x[2]))
+        sorted_team2 = sorted(team2, key=lambda x: positions_order.index(x[2]))
 
-        for player_name, player_data in team2:
+        for player_name, player_data, lane in sorted_team1:
+            self.team1_listbox.insert(tk.END,
+                                    f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
+
+        for player_name, player_data, lane in sorted_team2:
             self.team2_listbox.insert(tk.END,
-                                      f"{player_name}: {player_data['win_rate']}% ({player_data['games']} games)")
+                                    f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
 
 if __name__ == "__main__":
     players = load_players_data() or {}
