@@ -23,8 +23,6 @@ def he_can_be_added(player_name, team_players):
         return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
-    elif player_name == "杰尼龟":
-        return "c罗" not in team_players
     return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
