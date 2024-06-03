@@ -3,11 +3,11 @@ from tkinter import messagebox
 from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 
-# 55及以上为上等马
-# 46以下为下等马
+# 60及以上为上等马
+# 50以下为下等马
 # 其余为中等马
-kPowerThreshold = 55
-kNormalThreshold = 46
+kPowerThreshold = 60
+kNormalThreshold = 50
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
