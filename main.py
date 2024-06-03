@@ -4,10 +4,10 @@ from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 
 # 55及以上为上等马
-# 45-55为中等马
-# 45以下为下等马
+# 46以下为下等马
+# 其余为中等马
 kPowerThreshold = 55
-kNormalThreshold = 45
+kNormalThreshold = 46
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
@@ -87,10 +87,12 @@ def create_balanced_teams(selected_players):
     def weighted_win_rate(player):
         return player["win_rate"]
     players_list = list(selected_players.items())
+    
     # 将玩家按照其位置多样性升序，保证只玩一个位置的玩家可以优先被考虑；
     # 在位置数量一样的情况下，按胜率降序，保证强的选手可以优先被考虑
     sorted_players_by_pos =\
         sorted(players_list, key=lambda item: (len(item[1]["lane"]), -weighted_win_rate(item[1])), reverse=False)
+    
     # 初始化队伍和权重
     team1 = []
     team2 = []
@@ -137,7 +139,8 @@ def create_balanced_teams(selected_players):
                 team_assignment(team1, team1_weight, team1_positions, team1_players,
                                 team2, team2_weight, team2_positions, team2_players,
                                 weight, lane, player_name, player_data)
-    print("Final score:", team1_weight / 5, ":", team2_weight / 5)
+
+    print("平均胜率:", "Team 1: ", team1_weight / len(team1), ", Team 2: ", team2_weight / len(team2))
     return team1, team2
 
 def update_player_stats(players, player_name, is_winner):
@@ -222,7 +225,7 @@ class TeamBalancerApp:
         for player_name, player_data in sorted(self.players.items(), key=lambda item: -item[1]['win_rate']):
             self.player_tree.insert("", tk.END,
                                     values=(player_name, f"{player_data['win_rate']}%", player_data["games"]))
-
+    
     def toggle_selection(self, event):
         region = self.player_tree.identify("region", event.x, event.y)
         if region == "cell":
@@ -231,6 +234,7 @@ class TeamBalancerApp:
                 self.player_tree.selection_remove(item)
             else:
                 self.player_tree.selection_add(item)
+
 
     def update_win_loss(self, is_winner):
         selected_items = self.player_tree.selection()
