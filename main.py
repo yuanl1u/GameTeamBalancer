@@ -6,8 +6,8 @@ import json
 # 60及以上为上等马
 # 50以下为下等马
 # 其余为中等马
-kPowerThreshold = 60
-kNormalThreshold = 50
+kPowerThreshold = 55
+kNormalThreshold = 46
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
@@ -83,6 +83,8 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
 
 def create_balanced_teams(selected_players):
     def weighted_win_rate(player):
+        if player["games"] < 5:
+            return 50.0
         return player["win_rate"]
     players_list = list(selected_players.items())
     
