@@ -3,11 +3,11 @@ from tkinter import messagebox
 from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 
-# 55及以上为上等马
-# 46以下为下等马
+# 60及以上为上等马
+# 50以下为下等马
 # 其余为中等马
-kPowerThreshold = 55
-kNormalThreshold = 46
+kPowerThreshold = 60
+kNormalThreshold = 50
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
@@ -23,8 +23,6 @@ def he_can_be_added(player_name, team_players):
         return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
-    elif player_name == "杰尼龟":
-        return "c罗" not in team_players
     return True
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
