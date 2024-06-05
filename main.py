@@ -115,7 +115,7 @@ def create_balanced_teams(selected_players):
         # 优先分配特殊玩家到各自队伍并设定默认位置
         team1.append(("严酷训诫", next(data for name, data, _ in special_team1 if name == "严酷训诫"), "上单"))
         team1.append(("香克斯", next(data for name, data, _ in special_team1 if name == "香克斯"), "射手"))
-        team2.append(("基拉祈", next(data for name, data, _ in special_team2 if name == "基拉祈"), "中单"))
+        team2.append(("基拉祈", next(data for name, data, _ in special_team2 if name == "基拉祈"), "射手"))
         team2.append(("鸡", next(data for name, data, _ in special_team2 if name == "鸡"), "辅助"))
         team2.append(("小超梦", next(data for name, data, _ in special_team2 if name == "小超梦"), "上单"))
 
