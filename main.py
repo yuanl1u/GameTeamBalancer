@@ -6,8 +6,9 @@ import json
 # 55及以上为上等马
 # 45以下为下等马
 # 其余为中等马
-kPowerThreshold = 60
+kPowerThreshold = 55
 kNormalThreshold = 45
+
 
 def team_addition(team, team_weight, team_positions,
                   weight, lane, player_name, player_data):
@@ -16,14 +17,16 @@ def team_addition(team, team_weight, team_positions,
     team_positions[lane] += 1
     return team_weight
 
+
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
-    if player_name == "香克斯":
-        return "小超梦" not in team_players
+    # if player_name == "香克斯":
+    #     return "小超梦" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
     return True
+
 
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
                     team2, team2_weight, team2_positions, team2_players,
@@ -55,7 +58,7 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
     # 连续三轮选秀没有上等马，则将第三只中等马分给team1; 除此之外的中/下等马分给 team2
     if team1_avg < team2_avg:
         print("team1:", team1_avg, "team2:", team2_avg)
-        if weight >= kPowerThreshold or\
+        if weight >= kPowerThreshold or \
                 (len(team2) - len(team1) > 1 and weight >= kNormalThreshold):
             team1_weight = team_addition(team1, team1_weight, team1_positions,
                                          weight, lane, player_name, player_data)
@@ -68,7 +71,7 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
             print(player_name, lane, weight, "team2-2")
     else:
         print("team1:", team1_avg, "team2:", team2_avg)
-        if weight >= kPowerThreshold or\
+        if weight >= kPowerThreshold or \
                 (len(team1) - len(team2) > 1 and weight >= kNormalThreshold):
             team2_weight = team_addition(team2, team2_weight, team2_positions,
                                          weight, lane, player_name, player_data)
@@ -81,15 +84,31 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
             print(player_name, lane, weight, "team1-3")
     return team1_weight, team2_weight
 
+
+def weighted_win_rate(player):
+    if player["games"] < 5:
+        return 50.0  # 设置默认胜率为50%以避免极端情况
+    return player["win_rate"]
+
+
+def sort_team(players_list):
+    single_pos_players = [x for x in players_list if len(x[1]["lane"]) == 1]
+    multi_pos_players = [x for x in players_list if x not in single_pos_players]
+    sorted_multi_pos_players_by_wr = sorted(multi_pos_players, key=lambda item: weighted_win_rate(item[1]),
+                                            reverse=True)
+    sorted_multi_pos_players = []
+    mid_size = int(len(sorted_multi_pos_players_by_wr) / 2)
+    for i in range(mid_size):
+        sorted_multi_pos_players.append(sorted_multi_pos_players_by_wr[i])
+        sorted_multi_pos_players.append(sorted_multi_pos_players_by_wr[len(sorted_multi_pos_players_by_wr) - i - 1])
+    if len(sorted_multi_pos_players_by_wr) % 2 != 0:
+        sorted_multi_pos_players.append(sorted_multi_pos_players_by_wr[mid_size])
+    single_pos_players.extend(sorted_multi_pos_players)
+    return single_pos_players
+
+
 def create_balanced_teams(selected_players):
-
-    def weighted_win_rate(player):
-        if player["games"] < 5:
-            return 50.0  # 设置默认胜率为50%以避免极端情况
-        return player["win_rate"]
-
     players_list = list(selected_players.items())
-
     team1 = []
     team2 = []
     team1_weight = 0
@@ -141,25 +160,31 @@ def create_balanced_teams(selected_players):
                 # 双方队伍都缺少该位置的情况
                 if team1_positions[lane] < 1 and team2_positions[lane] < 1:
                     if he_can_be_added(player_name, team1_players):
-                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
-                                                                     team2, team2_weight, team2_positions, team2_players,
+                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions,
+                                                                     team1_players,
+                                                                     team2, team2_weight, team2_positions,
+                                                                     team2_players,
                                                                      weight, lane, player_name, player_data)
                         assigned = True
                         break
                     elif he_can_be_added(player_name, team2_players):
-                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
-                                                                     team2, team2_weight, team2_positions, team2_players,
+                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions,
+                                                                     team1_players,
+                                                                     team2, team2_weight, team2_positions,
+                                                                     team2_players,
                                                                      weight, lane, player_name, player_data)
                         assigned = True
                         break
                 elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name,
+                                                 player_data)
                     team1_players.append(player_name)
                     print(player_name, lane, weight, "team1-4")
                     assigned = True
                     break
                 elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name,
+                                                 player_data)
                     team2_players.append(player_name)
                     print(player_name, lane, weight, "team2-4")
                     assigned = True
@@ -171,8 +196,7 @@ def create_balanced_teams(selected_players):
     else:
         # 将玩家按照其位置多样性升序，保证只玩一个位置的玩家可以优先被考虑；
         # 在位置数量一样的情况下，按胜率降序，保证强的选手可以优先被考虑
-        sorted_players_by_pos = sorted(players_list, key=lambda item: (len(item[1]["lane"]), -weighted_win_rate(item[1])), reverse=False)
-
+        sorted_players_by_pos = sort_team(players_list)
         # 将玩家分配到队伍中，同时考虑其首选位置并平衡位置
         for player_name, player_data in sorted_players_by_pos:
             weight = weighted_win_rate(player_data)
@@ -187,13 +211,15 @@ def create_balanced_teams(selected_players):
                     assigned = True
                     break
                 elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name,
+                                                 player_data)
                     team1_players.append(player_name)
                     print(player_name, lane, weight, "team1-4")
                     assigned = True
                     break
                 elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name,
+                                                 player_data)
                     team2_players.append(player_name)
                     print(player_name, lane, weight, "team2-4")
                     assigned = True
@@ -203,10 +229,8 @@ def create_balanced_teams(selected_players):
                                                              team2, team2_weight, team2_positions, team2_players,
                                                              weight, lane, player_name, player_data)
 
-    
     print("平均胜率:", "Team 1: ", team1_weight / len(team1), ", Team 2: ", team2_weight / len(team2))
     return team1, team2
-
 
 
 def update_player_stats(players, player_name, is_winner):
@@ -225,6 +249,7 @@ def update_player_stats(players, player_name, is_winner):
     player_data["win"] = wins
     player_data["loss"] = loses
 
+
 def load_players_data(filename="players_data.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
@@ -238,6 +263,7 @@ def load_players_data(filename="players_data.json"):
 def save_players_data(players, filename="players_data.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
+
 
 class TeamBalancerApp:
     def __init__(self, root, players):
@@ -291,7 +317,7 @@ class TeamBalancerApp:
         for player_name, player_data in sorted(self.players.items(), key=lambda item: -item[1]['win_rate']):
             self.player_tree.insert("", tk.END,
                                     values=(player_name, f"{player_data['win_rate']}%", player_data["games"]))
-    
+
     def toggle_selection(self, event):
         region = self.player_tree.identify("region", event.x, event.y)
         if region == "cell":
@@ -300,7 +326,6 @@ class TeamBalancerApp:
                 self.player_tree.selection_remove(item)
             else:
                 self.player_tree.selection_add(item)
-
 
     def update_win_loss(self, is_winner):
         selected_items = self.player_tree.selection()
@@ -329,18 +354,19 @@ class TeamBalancerApp:
         self.team1_listbox.delete(0, tk.END)
         self.team2_listbox.delete(0, tk.END)
 
-    # 按位置排序
+        # 按位置排序
         positions_order = ["上单", "打野", "中单", "射手", "辅助"]
         sorted_team1 = sorted(team1, key=lambda x: positions_order.index(x[2]))
         sorted_team2 = sorted(team2, key=lambda x: positions_order.index(x[2]))
 
         for player_name, player_data, lane in sorted_team1:
             self.team1_listbox.insert(tk.END,
-                                    f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
+                                      f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
 
         for player_name, player_data, lane in sorted_team2:
             self.team2_listbox.insert(tk.END,
-                                    f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
+                                      f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)")
+
 
 if __name__ == "__main__":
     players = load_players_data() or {}
