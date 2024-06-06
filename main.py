@@ -134,7 +134,7 @@ def create_balanced_teams(selected_players):
         # 优先分配特殊玩家到各自队伍并设定默认位置
         team1.append(("严酷训诫", next(data for name, data, _ in special_team1 if name == "严酷训诫"), "上单"))
         team1.append(("香克斯", next(data for name, data, _ in special_team1 if name == "香克斯"), "射手"))
-        team2.append(("基拉祈", next(data for name, data, _ in special_team2 if name == "基拉祈"), "中单"))
+        team2.append(("基拉祈", next(data for name, data, _ in special_team2 if name == "基拉祈"), "射手"))
         team2.append(("鸡", next(data for name, data, _ in special_team2 if name == "鸡"), "辅助"))
         team2.append(("小超梦", next(data for name, data, _ in special_team2 if name == "小超梦"), "上单"))
 
@@ -144,7 +144,7 @@ def create_balanced_teams(selected_players):
 
         # 更新位置计数器
         team1_positions = {"上单": 1, "中单": 0, "打野": 0, "射手": 1, "辅助": 0}
-        team2_positions = {"上单": 1, "中单": 1, "打野": 0, "射手": 0, "辅助": 1}
+        team2_positions = {"上单": 1, "中单": 0, "打野": 0, "射手": 1, "辅助": 1}
 
         team1_players = [player_name for player_name, _, _ in team1]
         team2_players = [player_name for player_name, _, _ in team2]
