@@ -1,17 +1,17 @@
 {
     "c罗": {
-        "win_rate": 61.54,
-        "games": 26,
+        "win_rate": 59.26,
+        "games": 27,
         "win": 16,
-        "loss": 10,
+        "loss": 11,
         "lane": [
             "中单"
         ]
     },
     "杰尼龟": {
-        "win_rate": 61.54,
-        "games": 13,
-        "win": 8,
+        "win_rate": 64.29,
+        "games": 14,
+        "win": 9,
         "loss": 5,
         "lane": [
             "打野",
@@ -29,9 +29,9 @@
         ]
     },
     "鸡": {
-        "win_rate": 70.59,
-        "games": 17,
-        "win": 12,
+        "win_rate": 72.22,
+        "games": 18,
+        "win": 13,
         "loss": 5,
         "lane": [
             "上单",
@@ -57,19 +57,19 @@
         ]
     },
     "肥大": {
-        "win_rate": 44.83,
-        "games": 29,
+        "win_rate": 43.33,
+        "games": 30,
         "win": 13,
-        "loss": 16,
+        "loss": 17,
         "lane": [
             "打野",
             "辅助"
         ]
     },
     "波加曼": {
-        "win_rate": 45.0,
-        "games": 20,
-        "win": 9,
+        "win_rate": 47.62,
+        "games": 21,
+        "win": 10,
         "loss": 11,
         "lane": [
             "打野",
@@ -87,20 +87,20 @@
         ]
     },
     "豪力给": {
-        "win_rate": 54.55,
-        "games": 22,
+        "win_rate": 52.17,
+        "games": 23,
         "win": 12,
-        "loss": 10,
+        "loss": 11,
         "lane": [
             "打野",
             "辅助"
         ]
     },
     "香克斯": {
-        "win_rate": 60.71,
-        "games": 28,
+        "win_rate": 58.62,
+        "games": 29,
         "win": 17,
-        "loss": 11,
+        "loss": 12,
         "lane": [
             "射手",
             "辅助"
@@ -116,19 +116,19 @@
         ]
     },
     "基拉祈": {
-        "win_rate": 38.1,
-        "games": 21,
+        "win_rate": 36.36,
+        "games": 22,
         "win": 8,
-        "loss": 13,
+        "loss": 14,
         "lane": [
             "射手",
             "中单"
         ]
     },
     "大师": {
-        "win_rate": 26.67,
-        "games": 15,
-        "win": 4,
+        "win_rate": 31.25,
+        "games": 16,
+        "win": 5,
         "loss": 11,
         "lane": [
             "射手",
