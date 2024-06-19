@@ -21,10 +21,12 @@ def team_addition(team, team_weight, team_positions,
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
-    # if player_name == "香克斯":
-    #     return "小超梦" not in team_players
+    # if player_name == "杰尼龟":
+    #     return "鸡" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
+    # elif player_name == "鸡":
+    #     return "杰尼龟" not in team_players
     return True
 
 
