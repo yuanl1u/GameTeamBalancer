@@ -7,7 +7,7 @@ import json
 # 45以下为下等马
 # 其余为中等马
 kPowerThreshold = 55
-kNormalThreshold = 50
+kNormalThreshold = 45
 
 
 def team_addition(team, team_weight, team_positions,
@@ -21,8 +21,8 @@ def team_addition(team, team_weight, team_positions,
 def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
-    # if player_name == "杰尼龟":
-    #     return "鸡" not in team_players
+    elif player_name == "杰尼龟":
+        return "鸡" not in team_players
     elif player_name == "基拉祈" or player_name == "鸡":
         return "严酷训诫" not in team_players
     # elif player_name == "鸡":
