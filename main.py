@@ -7,7 +7,7 @@ import json
 # 45以下为下等马
 # 其余为中等马
 kPowerThreshold = 55
-kNormalThreshold = 48
+kNormalThreshold = 45
 
 
 def team_addition(team, team_weight, team_positions,
@@ -22,7 +22,9 @@ def he_can_be_added(player_name, team_players):
     if len(team_players) == 5:
         return False
     elif player_name == "杰尼龟":
-        return "鸡" not in team_players
+        return "鸡" not in team_players and "c罗" not in team_players
+    elif player_name == "c罗":
+        return "杰尼龟" not in team_players
     elif player_name == "基拉祈":
         return "严酷训域" not in team_players
     elif player_name == "鸡":
@@ -87,7 +89,11 @@ def team_assignment(team1, team1_weight, team1_positions, team1_players,
 
 
 def weighted_win_rate(player):
-    if player["games"] < 5:
+    if player["games"] < 5 and player["win_rate"] > 60.0:
+        return 60.0
+    elif player["games"] < 5 and player["win_rate"] < 40.0:
+        return 40.0
+    elif player["games"] < 5:
         return 50.0  # 设置默认胜率为50%以避免极端情况
     return player["win_rate"]
 
@@ -155,8 +161,8 @@ def create_balanced_teams(selected_players):
             if player_name in special_players:
                 continue
             weight = weighted_win_rate(player_data)
-            if player_name == "杰尼龟":
-                weight *= 1.1
+            #if player_name == "杰尼龟":
+            #    weight *= 1.1
             preferred_lanes = player_data["lane"]
             assigned = False
             for lane in preferred_lanes:
@@ -203,8 +209,8 @@ def create_balanced_teams(selected_players):
         # 将玩家分配到队伍中，同时考虑其首选位置并平衡位置
         for player_name, player_data in sorted_players_by_pos:
             weight = weighted_win_rate(player_data)
-            if player_name == "杰尼龟":
-                weight *= 1.1
+            #if player_name == "杰尼龟":
+            #    weight *= 1.1
             preferred_lanes = player_data["lane"]
             assigned = False
             for lane in preferred_lanes:
