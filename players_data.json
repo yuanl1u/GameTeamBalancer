@@ -9,9 +9,9 @@
         ]
     },
     "杰尼龟": {
-        "win_rate": 63.89,
-        "games": 72,
-        "win": 46,
+        "win_rate": 64.38,
+        "games": 73,
+        "win": 47,
         "loss": 26,
         "lane": [
             "打野",
@@ -39,10 +39,10 @@
         ]
     },
     "小超梦": {
-        "win_rate": 54.35,
-        "games": 92,
+        "win_rate": 53.76,
+        "games": 93,
         "win": 50,
-        "loss": 42,
+        "loss": 43,
         "lane": [
             "上单"
         ]
@@ -57,20 +57,20 @@
         ]
     },
     "肥大": {
-        "win_rate": 51.49,
-        "games": 134,
+        "win_rate": 51.11,
+        "games": 135,
         "win": 69,
-        "loss": 65,
+        "loss": 66,
         "lane": [
             "打野",
             "辅助"
         ]
     },
     "波加曼": {
-        "win_rate": 47.78,
-        "games": 90,
+        "win_rate": 47.25,
+        "games": 91,
         "win": 43,
-        "loss": 47,
+        "loss": 48,
         "lane": [
             "打野",
             "中单"
@@ -87,9 +87,9 @@
         ]
     },
     "豪力给": {
-        "win_rate": 47.58,
-        "games": 124,
-        "win": 59,
+        "win_rate": 48.0,
+        "games": 125,
+        "win": 60,
         "loss": 65,
         "lane": [
             "辅助",
@@ -97,28 +97,28 @@
         ]
     },
     "香克斯": {
-        "win_rate": 45.53,
-        "games": 123,
+        "win_rate": 45.16,
+        "games": 124,
         "win": 56,
-        "loss": 67,
+        "loss": 68,
         "lane": [
             "射手",
             "辅助"
         ]
     },
     "木守宫": {
-        "win_rate": 43.55,
-        "games": 124,
-        "win": 54,
+        "win_rate": 44.0,
+        "games": 125,
+        "win": 55,
         "loss": 70,
         "lane": [
             "上单"
         ]
     },
     "基拉祈": {
-        "win_rate": 32.73,
-        "games": 110,
-        "win": 36,
+        "win_rate": 33.33,
+        "games": 111,
+        "win": 37,
         "loss": 74,
         "lane": [
             "射手",
@@ -193,9 +193,9 @@
         ]
     },
     "口香糖": {
-        "win_rate": 66.67,
-        "games": 3,
-        "win": 2,
+        "win_rate": 75.0,
+        "games": 4,
+        "win": 3,
         "loss": 1,
         "lane": [
             "射手",
@@ -213,10 +213,10 @@
         ]
     },
     "小燕子": {
-        "win_rate": 100,
-        "games": 3,
+        "win_rate": 75.0,
+        "games": 4,
         "win": 3,
-        "loss": 0,
+        "loss": 1,
         "lane": [
             "辅助"
         ]
