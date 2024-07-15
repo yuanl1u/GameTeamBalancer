@@ -161,8 +161,8 @@ def create_balanced_teams(selected_players):
             if player_name in special_players:
                 continue
             weight = weighted_win_rate(player_data)
-            #if player_name == "杰尼龟":
-            #    weight *= 1.1
+            if player_name == "杰尼龟":
+               weight *= 1.1
             preferred_lanes = player_data["lane"]
             assigned = False
             for lane in preferred_lanes:
