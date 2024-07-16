@@ -1,9 +1,9 @@
 {
     "c罗": {
-        "win_rate": 55.69,
-        "games": 167,
+        "win_rate": 55.36,
+        "games": 168,
         "win": 93,
-        "loss": 74,
+        "loss": 75,
         "lane": [
             "中单"
         ]
@@ -28,9 +28,9 @@
         ]
     },
     "鸡": {
-        "win_rate": 59.65,
-        "games": 114,
-        "win": 68,
+        "win_rate": 60.0,
+        "games": 115,
+        "win": 69,
         "loss": 46,
         "lane": [
             "上单",
@@ -38,37 +38,37 @@
         ]
     },
     "小超梦": {
-        "win_rate": 55.65,
-        "games": 124,
-        "win": 69,
+        "win_rate": 56.0,
+        "games": 125,
+        "win": 70,
         "loss": 55,
         "lane": [
             "上单"
         ]
     },
     "左蛋": {
-        "win_rate": 52.38,
-        "games": 105,
+        "win_rate": 51.89,
+        "games": 106,
         "win": 55,
-        "loss": 50,
+        "loss": 51,
         "lane": [
             "辅助"
         ]
     },
     "肥大": {
-        "win_rate": 49.7,
-        "games": 165,
+        "win_rate": 49.4,
+        "games": 166,
         "win": 82,
-        "loss": 83,
+        "loss": 84,
         "lane": [
             "打野",
             "辅助"
         ]
     },
     "波加曼": {
-        "win_rate": 50.0,
-        "games": 118,
-        "win": 59,
+        "win_rate": 50.42,
+        "games": 119,
+        "win": 60,
         "loss": 59,
         "lane": [
             "打野",
@@ -76,10 +76,10 @@
         ]
     },
     "嘟嘟": {
-        "win_rate": 50.0,
-        "games": 82,
+        "win_rate": 49.4,
+        "games": 83,
         "win": 41,
-        "loss": 41,
+        "loss": 42,
         "lane": [
             "中单",
             "射手"
@@ -96,9 +96,9 @@
         ]
     },
     "香克斯": {
-        "win_rate": 43.66,
-        "games": 142,
-        "win": 62,
+        "win_rate": 44.06,
+        "games": 143,
+        "win": 63,
         "loss": 80,
         "lane": [
             "辅助",
@@ -106,10 +106,10 @@
         ]
     },
     "木守宫": {
-        "win_rate": 42.77,
-        "games": 159,
+        "win_rate": 42.5,
+        "games": 160,
         "win": 68,
-        "loss": 91,
+        "loss": 92,
         "lane": [
             "上单"
         ]
@@ -144,9 +144,9 @@
         ]
     },
     "宸哥": {
-        "win_rate": 48.15,
-        "games": 54,
-        "win": 26,
+        "win_rate": 49.09,
+        "games": 55,
+        "win": 27,
         "loss": 28,
         "lane": [
             "中单",
