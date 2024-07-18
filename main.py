@@ -3,7 +3,7 @@ from tkinter import messagebox
 from tkinter.ttk import Treeview, Scrollbar, Style
 import json
 
-# 55及以上为上等马
+# 54及以上为上等马
 # 45以下为下等马
 # 其余为中等马
 kPowerThreshold = 54
@@ -113,6 +113,84 @@ def sort_team(players_list):
     single_pos_players.extend(sorted_multi_pos_players)
     return single_pos_players
 
+def check_positions_covered(team_positions):
+    for pos in ["上单", "中单", "打野", "射手", "辅助"]:
+        if team_positions[pos] < 1:
+            return False
+    return True
+
+def swap_players_if_better(team1, team2, team1_weight, team2_weight):
+    best_team1, best_team2 = team1[:], team2[:]
+    best_diff = abs(team1_weight - team2_weight)
+    improved = False
+    final_team1_weight = team1_weight
+    final_team2_weight = team2_weight
+
+    for i, (p1_name, p1_data, p1_lane) in enumerate(team1):
+        for j, (p2_name, p2_data, p2_lane) in enumerate(team2):
+            if p1_lane == p2_lane or (p1_lane in p2_data["lane"] and p2_lane in p1_data["lane"]):
+                new_team1 = team1[:]
+                new_team2 = team2[:]
+                new_team1[i], new_team2[j] = (p2_name, p2_data, p2_lane), (p1_name, p1_data, p1_lane)
+                new_team1_weight = sum(weighted_win_rate(data) for _, data, _ in new_team1)
+                new_team2_weight = sum(weighted_win_rate(data) for _, data, _ in new_team2)
+                new_diff = abs(new_team1_weight - new_team2_weight)
+                if new_diff < best_diff:
+                    best_team1, best_team2 = new_team1[:], new_team2[:]
+                    best_diff = new_diff
+                    improved = True
+                    final_team1_weight = new_team1_weight
+                    final_team2_weight = new_team2_weight
+                    print("同位置互换成功！交易前胜率差：", abs(team1_weight - team2_weight), "交易后胜率差：", best_diff)
+
+    return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
+
+
+def adjust_positions(team1, team1_positions, team2, team2_positions):
+    all_positions = {"上单", "中单", "打野", "射手", "辅助"}
+
+    def find_player_for_position(team, position):
+        for i, (player_name, player_data, lane) in enumerate(team):
+            if position in player_data["lane"] and lane != position:
+                return i, (player_name, player_data, position)
+        return None, None
+
+    for pos in all_positions:
+        if team1_positions[pos] == 0:
+            index, player = find_player_for_position(team1, pos)
+            if player:
+                team1[index] = player
+                team1_positions[player[2]] += 1
+                team1_positions[pos] -= 1
+
+        if team2_positions[pos] == 0:
+            index, player = find_player_for_position(team2, pos)
+            if player:
+                team2[index] = player
+                team2_positions[player[2]] += 1
+                team2_positions[pos] -= 1
+
+    return team1, team1_positions, team2, team2_positions
+
+def adjust_positions_within_team(team, team_positions):
+    all_positions = ["上单", "中单", "打野", "射手", "辅助"]
+
+    def find_player_for_position(team, position):
+        for i, (player_name, player_data, lane) in enumerate(team):
+            if position in player_data["lane"] and lane != position:
+                return i, (player_name, player_data, position)
+        return None, None
+
+    for pos in all_positions:
+        if team_positions[pos] == 0:
+            index, player = find_player_for_position(team, pos)
+            if player:
+                current_position = player[2]
+                team[index] = player
+                team_positions[current_position] -= 1
+                team_positions[pos] += 1
+
+    return team, team_positions
 
 def create_balanced_teams(selected_players):
     players_list = list(selected_players.items())
@@ -125,120 +203,97 @@ def create_balanced_teams(selected_players):
     team1_players = []
     team2_players = []
 
-    # 提取特殊玩家并优先分配
-    special_players = {"基拉祈", "鸡", "严酷训诫", "小超梦", "香克斯"}
-    special_team1 = []
-    special_team2 = []
+    # 将玩家按照其位置多样性升序，保证只玩一个位置的玩家可以优先被考虑
+    sorted_players_by_pos = sort_team(players_list)
 
-    for player_name, player_data in players_list:
-        if player_name in special_players:
-            if player_name in {"严酷训诫", "香克斯"}:
-                special_team1.append((player_name, player_data, None))
-            else:
-                special_team2.append((player_name, player_data, None))
+    single_pos_players = [player for player in sorted_players_by_pos if len(player[1]["lane"]) == 1]
+    multi_pos_players = [player for player in sorted_players_by_pos if len(player[1]["lane"]) > 1]
 
-    if len(special_team1) == 2 and len(special_team2) == 3:
-        # 优先分配特殊玩家到各自队伍并设定默认位置
-        team1.append(("严酷训诫", next(data for name, data, _ in special_team1 if name == "严酷训诫"), "上单"))
-        team1.append(("香克斯", next(data for name, data, _ in special_team1 if name == "香克斯"), "射手"))
-        team2.append(("基拉祈", next(data for name, data, _ in special_team2 if name == "基拉祈"), "射手"))
-        team2.append(("鸡", next(data for name, data, _ in special_team2 if name == "鸡"), "辅助"))
-        team2.append(("小超梦", next(data for name, data, _ in special_team2 if name == "小超梦"), "上单"))
+    for player_name, player_data in single_pos_players:
+        lane = player_data["lane"][0]
+        weight = weighted_win_rate(player_data)
+        if team1_positions[lane] < 1:
+            team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+            team1_players.append(player_name)
+            print(player_name, lane, weight, "team1-单位置")
+        elif team2_positions[lane] < 1:
+            team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+            team2_players.append(player_name)
+            print(player_name, lane, weight, "team2-单位置")
 
-        # 更新队伍权重
-        team1_weight = sum(weighted_win_rate(player_data) for _, player_data, _ in team1)
-        team2_weight = sum(weighted_win_rate(player_data) for _, player_data, _ in team2)
+    # 争取有5个位置的选手
+    def assign_unique_position_players():
+        nonlocal team1_weight, team2_weight
+        assigned = False
+        for lane in ["上单", "中单", "打野", "射手", "辅助"]:
+            if team1_positions[lane] == 0 or team2_positions[lane] == 0:
+                for player_name, player_data in multi_pos_players:
+                    if lane in player_data["lane"]:
+                        weight = weighted_win_rate(player_data)
+                        if team1_positions[lane] == 0:
+                            team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                            team1_players.append(player_name)
+                            print(player_name, lane, weight, "team1-唯二位置")
+                            multi_pos_players.remove((player_name, player_data))
+                            assigned = True
+                            break
+                        elif team2_positions[lane] == 0:
+                            team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                            team2_players.append(player_name)
+                            print(player_name, lane, weight, "team2-唯二位置")
+                            multi_pos_players.remove((player_name, player_data))
+                            assigned = True
+                            break
+            if assigned:
+                break
+        return assigned
 
-        # 更新位置计数器
-        team1_positions = {"上单": 1, "中单": 0, "打野": 0, "射手": 1, "辅助": 0}
-        team2_positions = {"上单": 1, "中单": 0, "打野": 0, "射手": 1, "辅助": 1}
+    while assign_unique_position_players():
+        pass
 
-        team1_players = [player_name for player_name, _, _ in team1]
-        team2_players = [player_name for player_name, _, _ in team2]
-
-        # 将剩余玩家分配到队伍中，同时考虑其首选位置并平衡位置
-        for player_name, player_data in players_list:
-            if player_name in special_players:
-                continue
-            weight = weighted_win_rate(player_data)
-            if player_name == "杰尼龟":
-               weight *= 1.1
-            preferred_lanes = player_data["lane"]
-            assigned = False
-            for lane in preferred_lanes:
-                # 双方队伍都缺少该位置的情况
-                if team1_positions[lane] < 1 and team2_positions[lane] < 1:
-                    if he_can_be_added(player_name, team1_players):
-                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions,
-                                                                     team1_players,
-                                                                     team2, team2_weight, team2_positions,
-                                                                     team2_players,
-                                                                     weight, lane, player_name, player_data)
-                        assigned = True
-                        break
-                    elif he_can_be_added(player_name, team2_players):
-                        team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions,
-                                                                     team1_players,
-                                                                     team2, team2_weight, team2_positions,
-                                                                     team2_players,
-                                                                     weight, lane, player_name, player_data)
-                        assigned = True
-                        break
-                elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name,
-                                                 player_data)
-                    team1_players.append(player_name)
-                    print(player_name, lane, weight, "team1-4")
-                    assigned = True
-                    break
-                elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name,
-                                                 player_data)
-                    team2_players.append(player_name)
-                    print(player_name, lane, weight, "team2-4")
-                    assigned = True
-                    break
-            if not assigned:
+    for player_name, player_data in multi_pos_players:
+        weight = weighted_win_rate(player_data)
+        preferred_lanes = player_data["lane"]
+        assigned = False
+        for lane in preferred_lanes:
+            if team1_positions[lane] < 1 and team2_positions[lane] < 1:
                 team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
                                                              team2, team2_weight, team2_positions, team2_players,
                                                              weight, lane, player_name, player_data)
-    else:
-        # 将玩家按照其位置多样性升序，保证只玩一个位置的玩家可以优先被考虑；
-        # 在位置数量一样的情况下，按胜率降序，保证强的选手可以优先被考虑
-        sorted_players_by_pos = sort_team(players_list)
-        # 将玩家分配到队伍中，同时考虑其首选位置并平衡位置
-        for player_name, player_data in sorted_players_by_pos:
-            weight = weighted_win_rate(player_data)
-            #if player_name == "杰尼龟":
-            #   weight *= 1.1
-            preferred_lanes = player_data["lane"]
-            assigned = False
-            for lane in preferred_lanes:
-                # 双方队伍都缺少该位置的情况
-                if team1_positions[lane] < 1 and team2_positions[lane] < 1:
-                    team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
-                                                                 team2, team2_weight, team2_positions, team2_players,
-                                                                 weight, lane, player_name, player_data)
-                    assigned = True
-                    break
-                elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                    team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name,
-                                                 player_data)
-                    team1_players.append(player_name)
-                    print(player_name, lane, weight, "team1-4")
-                    assigned = True
-                    break
-                elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                    team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name,
-                                                 player_data)
-                    team2_players.append(player_name)
-                    print(player_name, lane, weight, "team2-4")
-                    assigned = True
-                    break
-            if not assigned:
-                team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
-                                                             team2, team2_weight, team2_positions, team2_players,
-                                                             weight, lane, player_name, player_data)
+                assigned = True
+                break
+            elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
+                team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                team1_players.append(player_name)
+                print(player_name, lane, weight, "team1-4")
+                assigned = True
+                break
+            elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
+                team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                team2_players.append(player_name)
+                print(player_name, lane, weight, "team2-4")
+                assigned = True
+                break
+        if not assigned:
+            team1_weight, team2_weight = team_assignment(team1, team1_weight, team1_positions, team1_players,
+                                                         team2, team2_weight, team2_positions, team2_players,
+                                                         weight, lane, player_name, player_data)
+
+    team1, team1_positions, team2, team2_positions = adjust_positions(team1, team1_positions, team2, team2_positions)
+
+    # 队伍内部位置调整
+    team1, team1_positions = adjust_positions_within_team(team1, team1_positions)
+    team2, team2_positions = adjust_positions_within_team(team2, team2_positions)
+
+    # 检查交换同位置玩家是否会有更合适的胜率
+    for _ in range(20):  # Try up to 10 times to improve balance
+        team1, team2, improved, team1_weight, team2_weight = swap_players_if_better(team1, team2, team1_weight, team2_weight)
+        if not improved:
+            break
+    
+    # 队伍内部位置调整
+    team1, team1_positions = adjust_positions_within_team(team1, team1_positions)
+    team2, team2_positions = adjust_positions_within_team(team2, team2_positions)
 
     print("平均胜率:", "Team 1: ", team1_weight / len(team1), ", Team 2: ", team2_weight / len(team2))
     return team1, team2
