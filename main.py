@@ -6,7 +6,7 @@ import json
 # 54及以上为上等马
 # 45以下为下等马
 # 其余为中等马
-kPowerThreshold = 53
+kPowerThreshold = 54
 kNormalThreshold = 45
 
 
@@ -27,6 +27,8 @@ def he_can_be_added(player_name, team_players):
         return "杰尼龟" not in team_players
     elif player_name == "基拉祈":
         return "严酷训域" not in team_players
+    elif player_name == "木守宫":
+        return "基拉祈" in team_players
     elif player_name == "鸡":
         return "杰尼龟" not in team_players and "严酷训诫" not in team_players
     return True
