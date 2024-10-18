@@ -214,6 +214,8 @@ def create_balanced_teams(selected_players):
     for player_name, player_data in single_pos_players:
         lane = player_data["lane"][0]
         weight = weighted_win_rate(player_data)
+        if player_name == "杰尼龟":
+            weight *= 1.1
         if team1_positions[lane] < 1:
             team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
             team1_players.append(player_name)
