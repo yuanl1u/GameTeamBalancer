@@ -320,7 +320,7 @@ def update_player_stats(players, player_name, is_winner):
     player_data["loss"] = loses
 
 
-def load_players_data(filename="players_data.json"):
+def load_players_data(filename="october.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
             players = json.load(file)
@@ -330,7 +330,7 @@ def load_players_data(filename="players_data.json"):
         return None
 
 
-def save_players_data(players, filename="players_data.json"):
+def save_players_data(players, filename="october.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
 
