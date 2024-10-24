@@ -144,7 +144,40 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
                     final_team1_weight = new_team1_weight
                     final_team2_weight = new_team2_weight
                     print("同位置互换成功！交易前胜率差：", abs(team1_weight - team2_weight), "交易后胜率差：", best_diff)
-
+    pos_player_weight_1 = dict()
+    i_1 = 0
+    for item in best_team1:
+        pos_player_weight_1[item[2]] = (item[0], item[1], i_1)
+        i_1 += 1
+    pos_player_weight_2 = dict()
+    i_2 = 0
+    for item in best_team2:
+        pos_player_weight_2[item[2]] = (item[0], item[1], i_2)
+        i_2 += 1
+    team1_sum = sum(weighted_win_rate(data) for _, data, _ in best_team1)
+    team2_sum = sum(weighted_win_rate(data) for _, data, _ in best_team2)
+    jg_id_1 = pos_player_weight_1["打野"][2]
+    mid_id_1 = pos_player_weight_1["中单"][2]
+    jg_id_2 = pos_player_weight_2["打野"][2]
+    mid_id_2 = pos_player_weight_2["中单"][2]
+    if pos_player_weight_1["中单"][0] == "c罗" and pos_player_weight_1["打野"][0] == "杰尼龟":
+        jg_change_diff = team1_sum - pos_player_weight_1['打野'][1]['win_rate'] + pos_player_weight_2["打野"][1]['win_rate']
+        mid_change_diff = team1_sum - pos_player_weight_1['中单'][1]['win_rate'] + pos_player_weight_2["中单"][1]['win_rate']
+        if jg_change_diff < mid_change_diff:
+            best_team1[jg_id_1], best_team2[jg_id_2] = ((pos_player_weight_2["打野"][0], pos_player_weight_2["打野"][1], "打野"),
+                                               ("杰尼龟", pos_player_weight_1["打野"][1], "打野"))
+        else:
+            best_team1[mid_id_1], best_team2[mid_id_2] = ((pos_player_weight_2["中单"][0], pos_player_weight_2["中单"][1], "中单"),
+                                                ("c罗", pos_player_weight_1["中单"][1], "中单"))
+    elif pos_player_weight_2["中单"][0] == "c罗" and pos_player_weight_2["打野"][0] == "杰尼龟":
+        jg_change_diff = team2_sum - pos_player_weight_2['打野'][1]['win_rate'] + pos_player_weight_1["打野"][1]['win_rate']
+        mid_change_diff = team2_sum - pos_player_weight_2['中单'][1]['win_rate'] + pos_player_weight_1["中单"][1]['win_rate']
+        if jg_change_diff < mid_change_diff:
+            best_team2[jg_id_2], best_team1[jg_id_1] = ((pos_player_weight_1["打野"][0], pos_player_weight_1["打野"][1], "打野"),
+                                               ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
+        else:
+            best_team2[mid_id_2], best_team1[mid_id_1] = ((pos_player_weight_1["中单"][0], pos_player_weight_1["中单"][1], "中单"),
+                                                ("c罗", pos_player_weight_2["中单"][1], "中单"))
     return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
 
 
