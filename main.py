@@ -156,6 +156,8 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
         i_2 += 1
     team1_sum = sum(weighted_win_rate(data) for _, data, _ in best_team1)
     team2_sum = sum(weighted_win_rate(data) for _, data, _ in best_team2)
+    if '打野' not in pos_player_weight_1 or '打野' not in pos_player_weight_2:
+        return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
     jg_id_1 = pos_player_weight_1["打野"][2]
     mid_id_1 = pos_player_weight_1["中单"][2]
     jg_id_2 = pos_player_weight_2["打野"][2]
@@ -177,7 +179,7 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
                                                ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
         else:
             best_team2[mid_id_2], best_team1[mid_id_1] = ((pos_player_weight_1["中单"][0], pos_player_weight_1["中单"][1], "中单"),
-                                                ("c罗", pos_player_weight_2["中单"][1], "中单"))
+                                               ("c罗", pos_player_weight_2["中单"][1], "中单"))
     return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
 
 
