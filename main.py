@@ -161,8 +161,8 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
     jg_id_2 = pos_player_weight_2["打野"][2]
     mid_id_2 = pos_player_weight_2["中单"][2]
     if pos_player_weight_1["中单"][0] == "c罗" and pos_player_weight_1["打野"][0] == "杰尼龟":
-        jg_change_diff = team1_sum - pos_player_weight_1['打野'][1]['win_rate'] + pos_player_weight_2["打野"][1]['win_rate']
-        mid_change_diff = team1_sum - pos_player_weight_1['中单'][1]['win_rate'] + pos_player_weight_2["中单"][1]['win_rate']
+        jg_change_diff = abs(team1_sum - pos_player_weight_1['打野'][1]['win_rate'] + pos_player_weight_2["打野"][1]['win_rate'] - team2_sum)
+        mid_change_diff = abs(team1_sum - pos_player_weight_1['中单'][1]['win_rate'] + pos_player_weight_2["中单"][1]['win_rate'] - team2_sum)
         if jg_change_diff < mid_change_diff:
             best_team1[jg_id_1], best_team2[jg_id_2] = ((pos_player_weight_2["打野"][0], pos_player_weight_2["打野"][1], "打野"),
                                                ("杰尼龟", pos_player_weight_1["打野"][1], "打野"))
@@ -170,8 +170,8 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
             best_team1[mid_id_1], best_team2[mid_id_2] = ((pos_player_weight_2["中单"][0], pos_player_weight_2["中单"][1], "中单"),
                                                 ("c罗", pos_player_weight_1["中单"][1], "中单"))
     elif pos_player_weight_2["中单"][0] == "c罗" and pos_player_weight_2["打野"][0] == "杰尼龟":
-        jg_change_diff = team2_sum - pos_player_weight_2['打野'][1]['win_rate'] + pos_player_weight_1["打野"][1]['win_rate']
-        mid_change_diff = team2_sum - pos_player_weight_2['中单'][1]['win_rate'] + pos_player_weight_1["中单"][1]['win_rate']
+        jg_change_diff = abs(team2_sum - pos_player_weight_2['打野'][1]['win_rate'] + pos_player_weight_1["打野"][1]['win_rate'] - team1_sum)
+        mid_change_diff = abs(team2_sum - pos_player_weight_2['中单'][1]['win_rate'] + pos_player_weight_1["中单"][1]['win_rate'] - team1_sum)
         if jg_change_diff < mid_change_diff:
             best_team2[jg_id_2], best_team1[jg_id_1] = ((pos_player_weight_1["打野"][0], pos_player_weight_1["打野"][1], "打野"),
                                                ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
