@@ -33,6 +33,7 @@ def he_can_be_added(player_name, team_players):
         return "杰尼龟" not in team_players and "严酷训诫" not in team_players
     return True
 
+
 def team_assignment(team1, team1_weight, team1_positions, team1_players,
                     team2, team2_weight, team2_positions, team2_players,
                     weight, lane, player_name, player_data):
@@ -115,11 +116,13 @@ def sort_team(players_list):
     single_pos_players.extend(sorted_multi_pos_players)
     return single_pos_players
 
+
 def check_positions_covered(team_positions):
     for pos in ["上单", "中单", "打野", "射手", "辅助"]:
         if team_positions[pos] < 1:
             return False
     return True
+
 
 def swap_players_if_better(team1, team2, team1_weight, team2_weight):
     best_team1, best_team2 = team1[:], team2[:]
@@ -156,30 +159,75 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
         i_2 += 1
     team1_sum = sum(weighted_win_rate(data) for _, data, _ in best_team1)
     team2_sum = sum(weighted_win_rate(data) for _, data, _ in best_team2)
-    if '打野' not in pos_player_weight_1 or '打野' not in pos_player_weight_2:
+    if ('打野' not in pos_player_weight_1 or '打野' not in pos_player_weight_2 or
+            '中单' not in pos_player_weight_1 or '中单' not in pos_player_weight_2):
         return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
     jg_id_1 = pos_player_weight_1["打野"][2]
     mid_id_1 = pos_player_weight_1["中单"][2]
     jg_id_2 = pos_player_weight_2["打野"][2]
     mid_id_2 = pos_player_weight_2["中单"][2]
-    if pos_player_weight_1["中单"][0] == "c罗" and pos_player_weight_1["打野"][0] == "杰尼龟":
-        jg_change_diff = abs(team1_sum - pos_player_weight_1['打野'][1]['win_rate'] + pos_player_weight_2["打野"][1]['win_rate'] - team2_sum)
-        mid_change_diff = abs(team1_sum - pos_player_weight_1['中单'][1]['win_rate'] + pos_player_weight_2["中单"][1]['win_rate'] - team2_sum)
+    if (pos_player_weight_1["中单"][0] == "c罗" and pos_player_weight_1["打野"][0] == "杰尼龟" and
+            pos_player_weight_1["射手"][0] == "右蛋" and pos_player_weight_1["辅助"][0] == "左蛋"):
+        best_team1[jg_id_1], best_team2[jg_id_2] = (
+            (pos_player_weight_2["打野"][0], pos_player_weight_2["打野"][1], "打野"),
+            ("杰尼龟", pos_player_weight_1["打野"][1], "打野"))
+    elif (pos_player_weight_2["中单"][0] == "c罗" and pos_player_weight_2["打野"][0] == "杰尼龟" and
+          pos_player_weight_2["射手"][0] == "右蛋" and pos_player_weight_2["辅助"][0] == "左蛋"):
+        best_team2[jg_id_2], best_team1[jg_id_1] = (
+            (pos_player_weight_1["打野"][0], pos_player_weight_1["打野"][1], "打野"),
+            ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
+    elif pos_player_weight_1["中单"][0] == "c罗" and pos_player_weight_1["打野"][0] == "杰尼龟":
+        jg_change_diff = abs(team1_sum - pos_player_weight_1['打野'][1]['win_rate'] + pos_player_weight_2["打野"][1][
+            'win_rate'] - team2_sum)
+        mid_change_diff = abs(team1_sum - pos_player_weight_1['中单'][1]['win_rate'] + pos_player_weight_2["中单"][1][
+            'win_rate'] - team2_sum)
         if jg_change_diff < mid_change_diff:
-            best_team1[jg_id_1], best_team2[jg_id_2] = ((pos_player_weight_2["打野"][0], pos_player_weight_2["打野"][1], "打野"),
-                                               ("杰尼龟", pos_player_weight_1["打野"][1], "打野"))
+            best_team1[jg_id_1], best_team2[jg_id_2] = (
+            (pos_player_weight_2["打野"][0], pos_player_weight_2["打野"][1], "打野"),
+            ("杰尼龟", pos_player_weight_1["打野"][1], "打野"))
         else:
-            best_team1[mid_id_1], best_team2[mid_id_2] = ((pos_player_weight_2["中单"][0], pos_player_weight_2["中单"][1], "中单"),
-                                                ("c罗", pos_player_weight_1["中单"][1], "中单"))
+            best_team1[mid_id_1], best_team2[mid_id_2] = (
+            (pos_player_weight_2["中单"][0], pos_player_weight_2["中单"][1], "中单"),
+            ("c罗", pos_player_weight_1["中单"][1], "中单"))
     elif pos_player_weight_2["中单"][0] == "c罗" and pos_player_weight_2["打野"][0] == "杰尼龟":
-        jg_change_diff = abs(team2_sum - pos_player_weight_2['打野'][1]['win_rate'] + pos_player_weight_1["打野"][1]['win_rate'] - team1_sum)
-        mid_change_diff = abs(team2_sum - pos_player_weight_2['中单'][1]['win_rate'] + pos_player_weight_1["中单"][1]['win_rate'] - team1_sum)
+        jg_change_diff = abs(team2_sum - pos_player_weight_2['打野'][1]['win_rate'] + pos_player_weight_1["打野"][1][
+            'win_rate'] - team1_sum)
+        mid_change_diff = abs(team2_sum - pos_player_weight_2['中单'][1]['win_rate'] + pos_player_weight_1["中单"][1][
+            'win_rate'] - team1_sum)
         if jg_change_diff < mid_change_diff:
-            best_team2[jg_id_2], best_team1[jg_id_1] = ((pos_player_weight_1["打野"][0], pos_player_weight_1["打野"][1], "打野"),
-                                               ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
+            best_team2[jg_id_2], best_team1[jg_id_1] = (
+            (pos_player_weight_1["打野"][0], pos_player_weight_1["打野"][1], "打野"),
+            ("杰尼龟", pos_player_weight_2["打野"][1], "打野"))
         else:
-            best_team2[mid_id_2], best_team1[mid_id_1] = ((pos_player_weight_1["中单"][0], pos_player_weight_1["中单"][1], "中单"),
-                                               ("c罗", pos_player_weight_2["中单"][1], "中单"))
+            best_team2[mid_id_2], best_team1[mid_id_1] = (
+            (pos_player_weight_1["中单"][0], pos_player_weight_1["中单"][1], "中单"),
+            ("c罗", pos_player_weight_2["中单"][1], "中单"))
+
+    pos_player_weight_1 = dict()
+    i_1 = 0
+    for item in best_team1:
+        pos_player_weight_1[item[2]] = (item[0], item[1], i_1)
+        i_1 += 1
+    pos_player_weight_2 = dict()
+    i_2 = 0
+    for item in best_team2:
+        pos_player_weight_2[item[2]] = (item[0], item[1], i_2)
+        i_2 += 1
+    if ('打野' not in pos_player_weight_1 or '打野' not in pos_player_weight_2 or
+            '辅助' not in pos_player_weight_1 or '辅助' not in pos_player_weight_2):
+        return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
+    sup_id_1 = pos_player_weight_1["辅助"][2]
+    sup_id_2 = pos_player_weight_2["辅助"][2]
+    if (pos_player_weight_1["打野"][0] == "杰尼龟" and pos_player_weight_1["射手"][0] == "右蛋" and
+            pos_player_weight_1["辅助"][0] == "左蛋"):
+        best_team1[sup_id_1], best_team2[sup_id_2] = (
+            (pos_player_weight_2["辅助"][0], pos_player_weight_2["辅助"][1], "辅助"),
+            ("左蛋", pos_player_weight_1["辅助"][1], "辅助"))
+    elif (pos_player_weight_2["打野"][0] == "杰尼龟" and pos_player_weight_2["射手"][0] == "右蛋" and
+          pos_player_weight_2["辅助"][0] == "左蛋"):
+        best_team2[sup_id_2], best_team1[sup_id_1] = (
+            (pos_player_weight_1["辅助"][0], pos_player_weight_1["辅助"][1], "辅助"),
+            ("左蛋", pos_player_weight_2["辅助"][1], "辅助"))
     return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
 
 
@@ -209,6 +257,7 @@ def adjust_positions(team1, team1_positions, team2, team2_positions):
 
     return team1, team1_positions, team2, team2_positions
 
+
 def adjust_positions_within_team(team, team_positions):
     all_positions = ["上单", "中单", "打野", "射手", "辅助"]
 
@@ -228,6 +277,7 @@ def adjust_positions_within_team(team, team_positions):
                 team_positions[pos] += 1
 
     return team, team_positions
+
 
 def create_balanced_teams(selected_players):
     players_list = list(selected_players.items())
@@ -249,8 +299,6 @@ def create_balanced_teams(selected_players):
     for player_name, player_data in single_pos_players:
         lane = player_data["lane"][0]
         weight = weighted_win_rate(player_data)
-        if player_name == "杰尼龟":
-            weight *= 1.1
         if team1_positions[lane] < 1:
             team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
             team1_players.append(player_name)
@@ -270,14 +318,16 @@ def create_balanced_teams(selected_players):
                     if lane in player_data["lane"]:
                         weight = weighted_win_rate(player_data)
                         if team1_positions[lane] == 0:
-                            team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                            team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane,
+                                                         player_name, player_data)
                             team1_players.append(player_name)
                             print(player_name, lane, weight, "team1-唯二位置")
                             multi_pos_players.remove((player_name, player_data))
                             assigned = True
                             break
                         elif team2_positions[lane] == 0:
-                            team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                            team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane,
+                                                         player_name, player_data)
                             team2_players.append(player_name)
                             print(player_name, lane, weight, "team2-唯二位置")
                             multi_pos_players.remove((player_name, player_data))
@@ -302,13 +352,15 @@ def create_balanced_teams(selected_players):
                 assigned = True
                 break
             elif team1_positions[lane] < 1 and he_can_be_added(player_name, team1_players):
-                team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name, player_data)
+                team1_weight = team_addition(team1, team1_weight, team1_positions, weight, lane, player_name,
+                                             player_data)
                 team1_players.append(player_name)
                 print(player_name, lane, weight, "team1-4")
                 assigned = True
                 break
             elif team2_positions[lane] < 1 and he_can_be_added(player_name, team2_players):
-                team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name, player_data)
+                team2_weight = team_addition(team2, team2_weight, team2_positions, weight, lane, player_name,
+                                             player_data)
                 team2_players.append(player_name)
                 print(player_name, lane, weight, "team2-4")
                 assigned = True
@@ -326,10 +378,11 @@ def create_balanced_teams(selected_players):
 
     # 检查交换同位置玩家是否会有更合适的胜率
     for _ in range(20):  # Try up to 10 times to improve balance
-        team1, team2, improved, team1_weight, team2_weight = swap_players_if_better(team1, team2, team1_weight, team2_weight)
+        team1, team2, improved, team1_weight, team2_weight = swap_players_if_better(team1, team2, team1_weight,
+                                                                                    team2_weight)
         if not improved:
             break
-    
+
     # 队伍内部位置调整
     team1, team1_positions = adjust_positions_within_team(team1, team1_positions)
     team2, team2_positions = adjust_positions_within_team(team2, team2_positions)
