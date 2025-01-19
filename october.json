@@ -1,17 +1,17 @@
 {
     "c罗": {
-        "win_rate": 54.84,
-        "games": 62,
-        "win": 34,
+        "win_rate": 56.25,
+        "games": 64,
+        "win": 36,
         "loss": 28,
         "lane": [
             "中单"
         ]
     },
     "杰尼龟": {
-        "win_rate": 70.0,
-        "games": 60,
-        "win": 42,
+        "win_rate": 70.97,
+        "games": 62,
+        "win": 44,
         "loss": 18,
         "lane": [
             "射手",
@@ -29,9 +29,9 @@
         ]
     },
     "鸡": {
-        "win_rate": 47.5,
-        "games": 40,
-        "win": 19,
+        "win_rate": 50.0,
+        "games": 42,
+        "win": 21,
         "loss": 21,
         "lane": [
             "辅助",
@@ -57,18 +57,18 @@
         ]
     },
     "左蛋": {
-        "win_rate": 48.84,
-        "games": 43,
+        "win_rate": 46.67,
+        "games": 45,
         "win": 21,
-        "loss": 22,
+        "loss": 24,
         "lane": [
             "辅助"
         ]
     },
     "肥大": {
-        "win_rate": 46.94,
-        "games": 49,
-        "win": 23,
+        "win_rate": 49.02,
+        "games": 51,
+        "win": 25,
         "loss": 26,
         "lane": [
             "打野",
@@ -76,9 +76,9 @@
         ]
     },
     "波加曼": {
-        "win_rate": 38.3,
-        "games": 47,
-        "win": 18,
+        "win_rate": 40.82,
+        "games": 49,
+        "win": 20,
         "loss": 29,
         "lane": [
             "打野",
@@ -86,39 +86,39 @@
         ]
     },
     "嘟嘟": {
-        "win_rate": 44.0,
-        "games": 50,
+        "win_rate": 42.31,
+        "games": 52,
         "win": 22,
-        "loss": 28,
+        "loss": 30,
         "lane": [
             "射手",
             "中单"
         ]
     },
     "豪力给": {
-        "win_rate": 48.39,
-        "games": 62,
+        "win_rate": 46.88,
+        "games": 64,
         "win": 30,
-        "loss": 32,
+        "loss": 34,
         "lane": [
             "辅助",
             "打野"
         ]
     },
     "木守宫": {
-        "win_rate": 48.21,
-        "games": 56,
+        "win_rate": 46.55,
+        "games": 58,
         "win": 27,
-        "loss": 29,
+        "loss": 31,
         "lane": [
             "上单"
         ]
     },
     "基拉祈": {
-        "win_rate": 48.15,
-        "games": 54,
+        "win_rate": 46.43,
+        "games": 56,
         "win": 26,
-        "loss": 28,
+        "loss": 30,
         "lane": [
             "中单"
         ]
