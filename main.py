@@ -7,7 +7,7 @@ import json
 # 45以下为下等马
 # 其余为中等马
 kPowerThreshold = 54
-kNormalThreshold = 45
+kNormalThreshold = 46
 
 
 def team_addition(team, team_weight, team_positions,
