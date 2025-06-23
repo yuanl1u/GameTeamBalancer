@@ -1,9 +1,9 @@
 {
     "c罗": {
-        "win_rate": 57.58,
-        "games": 66,
+        "win_rate": 55.88,
+        "games": 68,
         "win": 38,
-        "loss": 28,
+        "loss": 30,
         "lane": [
             "中单"
         ]
@@ -19,9 +19,9 @@
         ]
     },
     "鸡": {
-        "win_rate": 57.14,
-        "games": 70,
-        "win": 40,
+        "win_rate": 58.33,
+        "games": 72,
+        "win": 42,
         "loss": 30,
         "lane": [
             "辅助",
@@ -39,10 +39,10 @@
         ]
     },
     "严酷训诫": {
-        "win_rate": 56.36,
-        "games": 55,
+        "win_rate": 54.39,
+        "games": 57,
         "win": 31,
-        "loss": 24,
+        "loss": 26,
         "lane": [
             "上单",
             "射手"
@@ -58,9 +58,9 @@
         ]
     },
     "肥大": {
-        "win_rate": 43.84,
-        "games": 73,
-        "win": 32,
+        "win_rate": 45.33,
+        "games": 75,
+        "win": 34,
         "loss": 41,
         "lane": [
             "打野",
@@ -68,10 +68,10 @@
         ]
     },
     "波加曼": {
-        "win_rate": 41.07,
-        "games": 56,
+        "win_rate": 39.66,
+        "games": 58,
         "win": 23,
-        "loss": 33,
+        "loss": 35,
         "lane": [
             "打野",
             "射手"
@@ -88,9 +88,9 @@
         ]
     },
     "豪力给": {
-        "win_rate": 48.39,
-        "games": 62,
-        "win": 30,
+        "win_rate": 50.0,
+        "games": 64,
+        "win": 32,
         "loss": 32,
         "lane": [
             "打野",
@@ -98,27 +98,27 @@
         ]
     },
     "木守宫": {
-        "win_rate": 49.25,
-        "games": 67,
+        "win_rate": 47.83,
+        "games": 69,
         "win": 33,
-        "loss": 34,
+        "loss": 36,
         "lane": [
             "上单"
         ]
     },
     "基拉祈": {
-        "win_rate": 45.21,
-        "games": 73,
-        "win": 33,
+        "win_rate": 46.67,
+        "games": 75,
+        "win": 35,
         "loss": 40,
         "lane": [
             "中单"
         ]
     },
     "胖轩": {
-        "win_rate": 50.0,
-        "games": 18,
-        "win": 9,
+        "win_rate": 55.0,
+        "games": 20,
+        "win": 11,
         "loss": 9,
         "lane": [
             "射手",
@@ -136,10 +136,10 @@
         ]
     },
     "小刘": {
-        "win_rate": 40.0,
-        "games": 20,
+        "win_rate": 36.36,
+        "games": 22,
         "win": 8,
-        "loss": 12,
+        "loss": 14,
         "lane": [
             "上单",
             "辅助"
