@@ -49,10 +49,10 @@
         ]
     },
     "左蛋": {
-        "win_rate": 27.27,
-        "games": 11,
+        "win_rate": 30.0,
+        "games": 10,
         "win": 3,
-        "loss": 8,
+        "loss": 7,
         "lane": [
             "辅助"
         ]
@@ -78,10 +78,10 @@
         ]
     },
     "嘟嘟": {
-        "win_rate": 46.15,
-        "games": 13,
+        "win_rate": 42.86,
+        "games": 14,
         "win": 6,
-        "loss": 7,
+        "loss": 8,
         "lane": [
             "射手",
             "中单"
