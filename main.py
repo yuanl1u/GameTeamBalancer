@@ -220,16 +220,16 @@ def swap_players_if_better(team1, team2, team1_weight, team2_weight):
         return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
     sup_id_1 = pos_player_weight_1["辅助"][2]
     sup_id_2 = pos_player_weight_2["辅助"][2]
-    if (pos_player_weight_1["打野"][0] == "杰尼龟" and pos_player_weight_1["射手"][0] == "右蛋" and
-            pos_player_weight_1["辅助"][0] == "左蛋"):
-        best_team1[sup_id_1], best_team2[sup_id_2] = (
-            (pos_player_weight_2["辅助"][0], pos_player_weight_2["辅助"][1], "辅助"),
-            ("左蛋", pos_player_weight_1["辅助"][1], "辅助"))
-    elif (pos_player_weight_2["打野"][0] == "杰尼龟" and pos_player_weight_2["射手"][0] == "右蛋" and
-          pos_player_weight_2["辅助"][0] == "左蛋"):
-        best_team2[sup_id_2], best_team1[sup_id_1] = (
-            (pos_player_weight_1["辅助"][0], pos_player_weight_1["辅助"][1], "辅助"),
-            ("左蛋", pos_player_weight_2["辅助"][1], "辅助"))
+    # if (pos_player_weight_1["打野"][0] == "杰尼龟" and pos_player_weight_1["射手"][0] == "右蛋" and
+    #         pos_player_weight_1["辅助"][0] == "左蛋"):
+    #     best_team1[sup_id_1], best_team2[sup_id_2] = (
+    #         (pos_player_weight_2["辅助"][0], pos_player_weight_2["辅助"][1], "辅助"),
+    #         ("左蛋", pos_player_weight_1["辅助"][1], "辅助"))
+    # elif (pos_player_weight_2["打野"][0] == "杰尼龟" and pos_player_weight_2["射手"][0] == "右蛋" and
+    #       pos_player_weight_2["辅助"][0] == "左蛋"):
+    #     best_team2[sup_id_2], best_team1[sup_id_1] = (
+    #         (pos_player_weight_1["辅助"][0], pos_player_weight_1["辅助"][1], "辅助"),
+    #         ("左蛋", pos_player_weight_2["辅助"][1], "辅助"))
     return best_team1, best_team2, improved, final_team1_weight, final_team2_weight
 
 
