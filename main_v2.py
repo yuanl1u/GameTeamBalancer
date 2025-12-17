@@ -482,17 +482,43 @@ class TeamBalancerApp:
 
     # ---------------- actions ----------------
 
-    def update_win_loss(self, is_winner):
+    def update_win_loss(self, is_winner: bool):
         selected_items = self.player_tree.selection()
         if not selected_items:
             return
-        for item in selected_items:
-            player_name = self.player_tree.item(item, 'values')[0]
-            update_player_stats(self.players, player_name, is_winner)
+
+        tv = self.player_tree
+
+        # 1) 记住“当前选中的玩家名字”（用名字恢复选择最稳）
+        selected_names = [tv.item(i, "values")[0] for i in selected_items]
+
+        # 2) 更新数据（一次按钮点击 = 1 场）
+        for name in selected_names:
+            update_player_stats(self.players, name, is_winner)
+
         save_players_data(self.players)
-        # 直接重建，保持斑马纹与列宽正确
+
+        # 3) 重建列表（会导致 iid 变化，所以必须之后恢复选择）
         self.populate_player_tree()
+
+        # 4) name -> iid 映射，恢复选择
+        name_to_iid = {}
+        for iid in tv.get_children(""):
+            nm = tv.item(iid, "values")[0]
+            name_to_iid[nm] = iid
+
+        restore_iids = [name_to_iid[n] for n in selected_names if n in name_to_iid]
+        if restore_iids:
+            tv.selection_set(restore_iids)
+            tv.focus(restore_iids[-1])
+            self._sel_anchor = restore_iids[-1]  # 让 shift 选择行为也正常
+        else:
+            tv.selection_remove(tv.selection())
+            tv.focus("")
+            self._sel_anchor = None
+
         self.update_selected_count()
+
 
     def balance_teams(self):
         selected_items = self.player_tree.selection()
