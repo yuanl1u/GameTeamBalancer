@@ -213,6 +213,7 @@ class TeamBalancerApp:
         self.player_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         self.player_tree.bind('<Button-1>', self.toggle_selection)
+        self._anchor_item = None
 
         self.win_button = tk.Button(root, text="Win", command=lambda: self.update_win_loss(True))
         self.loss_button = tk.Button(root, text="Loss", command=lambda: self.update_win_loss(False))
@@ -237,13 +238,67 @@ class TeamBalancerApp:
                                     values=(player_name, f"{player_data['win_rate']}%", player_data["games"]))
 
     def toggle_selection(self, event):
-        region = self.player_tree.identify("region", event.x, event.y)
-        if region == "cell":
-            item = self.player_tree.identify_row(event.y)
-            if self.player_tree.selection_includes(item):
-                self.player_tree.selection_remove(item)
+        tv = self.player_tree
+
+        # 只处理点击在单元格/行区域的情况
+        region = tv.identify("region", event.x, event.y)
+        if region not in ("cell", "tree"):
+            return
+
+        item = tv.identify_row(event.y)
+        if not item:
+            return
+
+        # Windows 上常见：Shift=0x0001, Ctrl=0x0004（不同平台可能有差异，但这俩在 Win 基本稳）
+        shift = (event.state & 0x0001) != 0
+        ctrl  = (event.state & 0x0004) != 0
+
+        selected = set(tv.selection())
+
+        # 初始化锚点：上一次“非 shift 点击”的那一行
+        if not hasattr(self, "_sel_anchor"):
+            self._sel_anchor = None
+
+        if shift:
+            # Shift：连续选择（不管当前是否已选，都按范围选择）
+            # 如果没有锚点，则用当前 focus 或任一已选项作为锚点
+            anchor = self._sel_anchor or tv.focus() or (next(iter(selected)) if selected else item)
+            items = list(tv.get_children(""))
+            try:
+                a = items.index(anchor)
+            except ValueError:
+                a = items.index(item)
+            b = items.index(item)
+            lo, hi = (a, b) if a <= b else (b, a)
+
+            # 这里的语义按你说的“shift 覆盖中间所有”——通常不保留其它离散选择
+            tv.selection_set(items[lo:hi + 1])
+            tv.focus(item)
+            return "break"
+
+        if ctrl:
+            # Ctrl：toggle 单行，不影响其它
+            if item in selected:
+                tv.selection_remove(item)
             else:
-                self.player_tree.selection_add(item)
+                tv.selection_add(item)
+            tv.focus(item)
+            # ctrl 点击不改变锚点（也可以改成 item，看你习惯）
+            return "break"
+
+        # 普通单击：清空之前选择，只选当前；如果点到已选中，则取消（toggle）
+        if item in selected and len(selected) == 1:
+            tv.selection_remove(item)
+            tv.focus("")
+            self._sel_anchor = None
+        else:
+            tv.selection_set(item)
+            tv.focus(item)
+            self._sel_anchor = item
+
+        return "break"
+
+
 
     def update_win_loss(self, is_winner):
         selected_items = self.player_tree.selection()
