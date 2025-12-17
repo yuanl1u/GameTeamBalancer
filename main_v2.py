@@ -172,7 +172,7 @@ class TeamBalancerApp:
 
         # ---- window ----
         root.title("Team Balancer")
-        root.minsize(880, 560)
+        root.minsize(660, 700)
         root.configure(bg="#F6F7FB")
         try:
             root.tk.call('tk', 'scaling', 1.2)
@@ -206,35 +206,45 @@ class TeamBalancerApp:
                         borderwidth=0)
         style.configure("Treeview.Heading", font=UI_FONT_BOLD)
         style.map("Treeview",
-                  background=[("selected", "#DCEBFF")],
-                  foreground=[("selected", "#1A1A1A")])
+                background=[("selected", "#6B9BF5")],   # 深一点的蓝
+                foreground=[("selected", "#0F1E3A")])
+
+
 
         style.configure("Primary.TButton", font=UI_FONT, padding=(12, 8))
         style.configure("Secondary.TButton", font=UI_FONT, padding=(12, 8))
 
         # ---- layout root ----
-        outer = ttk.Frame(root, style="App.TFrame", padding=14)
+        outer = ttk.Frame(root, style="App.TFrame", padding=8)
         outer.grid(row=0, column=0, sticky="nsew")
         root.grid_rowconfigure(0, weight=1)
         root.grid_columnconfigure(0, weight=1)
 
-        outer.grid_columnconfigure(0, weight=3)
-        outer.grid_columnconfigure(1, weight=2)
-        outer.grid_rowconfigure(2, weight=1)
+        RIGHT_W = 220
+
+        outer.grid_columnconfigure(0, weight=1)              # 左侧吃剩余
+        outer.grid_columnconfigure(1, weight=0, minsize=RIGHT_W)  # 右侧固定宽
+        outer.grid_rowconfigure(1, weight=1)
 
         # ---- top: title + hint + selected count ----
-        title = ttk.Label(outer, text="请选择本次参与游戏的 10 人", style="Title.TLabel")
-        title.grid(row=0, column=0, sticky="w", pady=(0, 6))
+        header = ttk.Frame(outer, style="App.TFrame")
+        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
+        header.grid_columnconfigure(0, weight=1)
+        header.grid_columnconfigure(1, weight=0)
 
-        self.selected_count_label = ttk.Label(outer, text="已选 0 / 10", style="Info.TLabel")
-        self.selected_count_label.grid(row=0, column=1, sticky="e", pady=(0, 6))
+        title = ttk.Label(header, text="请选择本次参与游戏的 10 人", style="Title.TLabel")
+        title.grid(row=0, column=0, sticky="w")
 
-        hint = ttk.Label(outer, text="单击：仅选中该行；Ctrl：多选；Shift：范围选择", style="Hint.TLabel")
-        hint.grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 10))
+        hint = ttk.Label(header, text="单击：仅选中该行；Ctrl：多选；Shift：范围选择", style="Hint.TLabel")
+        hint.grid(row=1, column=0, sticky="w", pady=(2, 0))
+
+        # 右上角计数（你原来已有“已选 x/10”就放这里）
+        self.selected_count_label = ttk.Label(header, text="已选 0 / 10", style="Hint.TLabel")
+        self.selected_count_label.grid(row=0, column=1, sticky="e")
 
         # ---- left card: player list ----
-        left_card = ttk.Frame(outer, style="Card.TFrame", padding=10)
-        left_card.grid(row=2, column=0, sticky="nsew", padx=(0, 10))
+        left_card = ttk.Frame(outer, style="Card.TFrame", padding=8)
+        left_card.grid(row=1, column=0, sticky="nsew", padx=(0, 10))
         left_card.grid_rowconfigure(1, weight=1)
         left_card.grid_columnconfigure(0, weight=1)
 
@@ -251,14 +261,15 @@ class TeamBalancerApp:
         self.player_tree.heading("Name", text="名字", anchor="center")
         self.player_tree.heading("WinRate", text="胜率", anchor="center")
         self.player_tree.heading("Games", text="总游戏数", anchor="center")
-        self.player_tree.column("Name", width=160, anchor="center")
+        self.player_tree.column("Name", width=100, anchor="center")
         self.player_tree.column("WinRate", width=100, anchor="center")
         self.player_tree.column("Games", width=100, anchor="center")
 
-        # zebra tags + hover
+
         self.player_tree.tag_configure("even", background="#FFFFFF")
-        self.player_tree.tag_configure("odd", background="#F2F5FB")
-        self.player_tree.tag_configure("hover", background="#E9EEF7")
+        self.player_tree.tag_configure("odd", background="#F3F3F3")     # 灰
+        self.player_tree.tag_configure("hover", background="#EAEAEA")   # 灰（略深）
+
 
         yscroll = ttk.Scrollbar(left_card, command=self.player_tree.yview)
         self.player_tree.configure(yscrollcommand=yscroll.set)
@@ -274,18 +285,21 @@ class TeamBalancerApp:
         self.populate_player_tree()
 
         # ---- right column ----
-        right_col = ttk.Frame(outer, style="App.TFrame")
-        right_col.grid(row=2, column=1, sticky="nsew")
+        right_col = ttk.Frame(outer, style="App.TFrame", width=RIGHT_W)
+        right_col.grid(row=1, column=1, sticky="nsew")
+        right_col.grid_propagate(False) 
+        right_col.grid_columnconfigure(0, weight=1)
+        right_col.grid_rowconfigure(1, weight=1)  
+
 
         # controls card
-        ctrl_card = ttk.Frame(right_col, style="Card.TFrame", padding=10)
+        ctrl_card = ttk.Frame(right_col, style="Card.TFrame", padding=8)
         ctrl_card.grid(row=0, column=0, sticky="ew")
         ctrl_card.grid_columnconfigure(0, weight=1)
 
         ctrl_title = ttk.Label(ctrl_card, text="操作", style="SubTitle.TLabel")
         ctrl_title.grid(row=0, column=0, sticky="w", pady=(0, 8))
 
-        # !!! 关键：这里不要用 Card.TFrame（会出现两道线），用 App.TFrame
         btn_row = ttk.Frame(ctrl_card, style="App.TFrame")
         btn_row.grid(row=1, column=0, sticky="ew")
         btn_row.grid_columnconfigure(0, weight=1)
@@ -303,7 +317,7 @@ class TeamBalancerApp:
         self.balance_button.grid(row=2, column=0, sticky="ew", pady=(10, 0))
 
         # result card
-        result_card = ttk.Frame(right_col, style="Card.TFrame", padding=10)
+        result_card = ttk.Frame(right_col, style="Card.TFrame", padding=8)
         result_card.grid(row=1, column=0, sticky="nsew", pady=(10, 0))
         result_card.grid_columnconfigure(0, weight=1)
 
@@ -312,7 +326,7 @@ class TeamBalancerApp:
         team1_title.grid(row=0, column=0, sticky="w", pady=(0, 6))
 
         self.team1_listbox = tk.Listbox(
-            result_card, width=32, height=7,
+            result_card, width=22, height=7,
             font=("Microsoft YaHei UI", 11),
             bg="#FFFFFF", relief="solid", bd=1,
             highlightthickness=0, selectbackground="#DCEBFF",
@@ -328,7 +342,7 @@ class TeamBalancerApp:
         team2_title.grid(row=3, column=0, sticky="w", pady=(6, 6))
 
         self.team2_listbox = tk.Listbox(
-            result_card, width=32, height=7,
+            result_card, width=22, height=7,
             font=("Microsoft YaHei UI", 11),
             bg="#FFFFFF", relief="solid", bd=1,
             highlightthickness=0, selectbackground="#DCEBFF",
