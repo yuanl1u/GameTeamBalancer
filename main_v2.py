@@ -110,7 +110,7 @@ def create_balanced_teams(selected_players):
     backtrack(0)
 
     if best_assign is None:
-        raise ValueError("无法找到满足“两队各5人且五位置齐全”的分配方案（可能是位置选择集合导致不可行）")
+        raise ValueError("无法找到满足“两队各5人且五位置齐全”的分配方案")
 
     team1, team2 = [], []
     t1_sum, t2_sum = 0.0, 0.0
@@ -206,7 +206,7 @@ class TeamBalancerApp:
                         borderwidth=0)
         style.configure("Treeview.Heading", font=UI_FONT_BOLD)
         style.map("Treeview",
-                background=[("selected", "#6B9BF5")],   # 深一点的蓝
+                background=[("selected", "#6B9BF5")],
                 foreground=[("selected", "#0F1E3A")])
 
 
@@ -222,8 +222,8 @@ class TeamBalancerApp:
 
         RIGHT_W = 220
 
-        outer.grid_columnconfigure(0, weight=1)              # 左侧吃剩余
-        outer.grid_columnconfigure(1, weight=0, minsize=RIGHT_W)  # 右侧固定宽
+        outer.grid_columnconfigure(0, weight=1)
+        outer.grid_columnconfigure(1, weight=0, minsize=RIGHT_W)
         outer.grid_rowconfigure(1, weight=1)
 
         # ---- top: title + hint + selected count ----
@@ -238,7 +238,7 @@ class TeamBalancerApp:
         hint = ttk.Label(header, text="单击：仅选中该行；Ctrl：多选；Shift：范围选择", style="Hint.TLabel")
         hint.grid(row=1, column=0, sticky="w", pady=(2, 0))
 
-        # 右上角计数（你原来已有“已选 x/10”就放这里）
+        # 右上角计数
         self.selected_count_label = ttk.Label(header, text="已选 0 / 10", style="Hint.TLabel")
         self.selected_count_label.grid(row=0, column=1, sticky="e")
 
@@ -258,17 +258,17 @@ class TeamBalancerApp:
             height=16,
             selectmode="extended"
         )
-        self.player_tree.heading("Name", text="名字", anchor="center")
+        self.player_tree.heading("Name", text="玩家ID", anchor="center")
         self.player_tree.heading("WinRate", text="胜率", anchor="center")
-        self.player_tree.heading("Games", text="总游戏数", anchor="center")
+        self.player_tree.heading("Games", text="总场次", anchor="center")
         self.player_tree.column("Name", width=100, anchor="center")
         self.player_tree.column("WinRate", width=100, anchor="center")
         self.player_tree.column("Games", width=100, anchor="center")
 
 
         self.player_tree.tag_configure("even", background="#FFFFFF")
-        self.player_tree.tag_configure("odd", background="#F3F3F3")     # 灰
-        self.player_tree.tag_configure("hover", background="#EAEAEA")   # 灰（略深）
+        self.player_tree.tag_configure("odd", background="#F3F3F3")    
+        self.player_tree.tag_configure("hover", background="#EAEAEA")  
 
 
         yscroll = ttk.Scrollbar(left_card, command=self.player_tree.yview)
@@ -384,7 +384,7 @@ class TeamBalancerApp:
         self.autosize_treeview_columns()
 
     def autosize_treeview_columns(self, pad_px=20, max_px=360):
-        # 根据内容自动调整列宽（包含 heading）
+        # 根据内容自动调整列宽
         tv = self.player_tree
         font = tkfont.Font(font=ttk.Style().lookup("Treeview", "font"))
 
@@ -463,7 +463,6 @@ class TeamBalancerApp:
             else:
                 tv.selection_add(item)
             tv.focus(item)
-            # ctrl 不强制更新 anchor，避免 shift 范围出奇怪行为
             self.update_selected_count()
             return "break"
 
@@ -489,7 +488,7 @@ class TeamBalancerApp:
 
         tv = self.player_tree
 
-        # 1) 记住“当前选中的玩家名字”（用名字恢复选择最稳）
+        # 1) 记住当前选中的玩家名字
         selected_names = [tv.item(i, "values")[0] for i in selected_items]
 
         # 2) 更新数据（一次按钮点击 = 1 场）
@@ -498,7 +497,7 @@ class TeamBalancerApp:
 
         save_players_data(self.players)
 
-        # 3) 重建列表（会导致 iid 变化，所以必须之后恢复选择）
+        # 3) 重建列表（会导致 iid 变化）
         self.populate_player_tree()
 
         # 4) name -> iid 映射，恢复选择
@@ -511,7 +510,7 @@ class TeamBalancerApp:
         if restore_iids:
             tv.selection_set(restore_iids)
             tv.focus(restore_iids[-1])
-            self._sel_anchor = restore_iids[-1]  # 让 shift 选择行为也正常
+            self._sel_anchor = restore_iids[-1]
         else:
             tv.selection_remove(tv.selection())
             tv.focus("")
@@ -561,7 +560,7 @@ class TeamBalancerApp:
 
         self.team1_avg_label.config(text=f"平均胜率: {t1_avg:.2f}%")
         self.team2_avg_label.config(text=f"平均胜率: {t2_avg:.2f}%")
-        self.diff_label.config(text=f"差值: {diff:.2f}%")
+        self.diff_label.config(text=f"胜率差值: {diff:.2f}%")
 
         self.update_selected_count()
 
