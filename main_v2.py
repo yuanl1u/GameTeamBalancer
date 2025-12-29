@@ -22,7 +22,18 @@ def create_balanced_teams(selected_players):
     - 每队五个位置(上单/中单/打野/射手/辅助)各1人
     - 只有1个位置的选手必须打该位置
     - 在满足约束的所有方案里，使两队平均胜率差最小
+    - NEW: c罗 和 杰尼龟 不能同队
     """
+    # ---------- config: constraints ----------
+    CANT_SAME_TEAM = [("c罗", "杰尼龟")]
+
+    def norm_name(s: str) -> str:
+        # 轻量规范化：避免前后空格/大小写影响
+        return (s or "").strip().lower()
+
+    cant_pairs = [(norm_name(a), norm_name(b)) for a, b in CANT_SAME_TEAM]
+
+    # ---------- build players ----------
     players = []
     for name, data in selected_players.items():
         lanes = list(data.get("lane", []))
@@ -33,8 +44,10 @@ def create_balanced_teams(selected_players):
     if len(players) != 10:
         raise ValueError("selected_players 必须恰好 10 人")
 
+    # 10 slots: (team_id, lane)
     slots = [(1, lane) for lane in LANES] + [(2, lane) for lane in LANES]
 
+    # lane -> candidate player indices
     lane_to_candidates = {lane: [] for lane in LANES}
     for i, (_, _, _, lanes) in enumerate(players):
         for lane in lanes:
@@ -49,33 +62,57 @@ def create_balanced_teams(selected_players):
         _, lane = s
         return len(lane_to_candidates[lane])
 
+    # fill the most constrained lane first
     slots_sorted = sorted(slots, key=slot_key)
 
-    used = [False] * 10
-    assign = [None] * 10
+    used = [False] * 10              # player index used or not
+    assign = [None] * len(slots_sorted)  # slot idx -> player idx
 
+    # slot -> candidate indices (by lane)
     slot_candidates = []
-    for team_id, lane in slots_sorted:
+    for _, lane in slots_sorted:
         cands = []
         for i, (_, _, _, lanes) in enumerate(players):
             if lane in lanes:
                 cands.append(i)
         slot_candidates.append(cands)
 
+    # quick index->normalized name
+    idx_to_norm_name = {i: norm_name(players[i][0]) for i in range(10)}
+
+    # per team current members (normalized names)
+    team_members = {1: set(), 2: set()}
+
+    def violates_cant_same_team(team_id: int, nm: str) -> bool:
+        s = team_members[team_id]
+        for a, b in cant_pairs:
+            if nm == a and b in s:
+                return True
+            if nm == b and a in s:
+                return True
+        return False
+
     best_assign = None
     best_diff = float("inf")
 
-    def backtrack(pos):
+    def backtrack(pos: int):
         nonlocal best_assign, best_diff
 
         if pos == len(slots_sorted):
-            t1 = []
-            t2 = []
-            for k, (team_id, lane) in enumerate(slots_sorted):
+            t1_sum = 0.0
+            t2_sum = 0.0
+            t1_cnt = 0
+            t2_cnt = 0
+            for k, (team_id, _) in enumerate(slots_sorted):
                 pi = assign[k]
                 _, _, wr, _ = players[pi]
-                (t1 if team_id == 1 else t2).append(wr)
-            diff = abs(sum(t1) / 5.0 - sum(t2) / 5.0)
+                if team_id == 1:
+                    t1_sum += wr
+                    t1_cnt += 1
+                else:
+                    t2_sum += wr
+                    t2_cnt += 1
+            diff = abs(t1_sum / 5.0 - t2_sum / 5.0)
             if diff < best_diff:
                 best_diff = diff
                 best_assign = assign[:]
@@ -87,10 +124,17 @@ def create_balanced_teams(selected_players):
             if used[pi]:
                 continue
 
+            nm = idx_to_norm_name[pi]
+
+            # NEW: mutual exclusion rule
+            if violates_cant_same_team(team_id, nm):
+                continue
+
             used[pi] = True
             assign[pos] = pi
+            team_members[team_id].add(nm)
 
-            # 剪枝：确保未来每个未填槽位还有候选可用
+            # pruning: ensure remaining lanes still have at least one unused candidate
             ok = True
             filled = {(slots_sorted[k][0], slots_sorted[k][1]) for k in range(pos + 1)}
             for (t, l) in slots_sorted[pos + 1:]:
@@ -104,16 +148,18 @@ def create_balanced_teams(selected_players):
             if ok:
                 backtrack(pos + 1)
 
+            team_members[team_id].remove(nm)
             used[pi] = False
             assign[pos] = None
 
     backtrack(0)
 
     if best_assign is None:
-        raise ValueError("无法找到满足“两队各5人且五位置齐全”的分配方案")
+        raise ValueError("无法找到满足“两队各5人且五位置齐全 + 互斥规则”的分配方案")
 
     team1, team2 = [], []
     t1_sum, t2_sum = 0.0, 0.0
+
     for k, (team_id, lane) in enumerate(slots_sorted):
         pi = best_assign[k]
         name, data, wr, _ = players[pi]
@@ -126,6 +172,7 @@ def create_balanced_teams(selected_players):
 
     print("平均胜率:", "Team 1: ", t1_sum / 5.0, ", Team 2: ", t2_sum / 5.0, " | 差值:", abs(t1_sum/5.0 - t2_sum/5.0))
     return team1, team2
+
 
 
 def update_player_stats(players, player_name, is_winner):
