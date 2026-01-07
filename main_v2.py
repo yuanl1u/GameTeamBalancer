@@ -7,23 +7,57 @@ import json
 LANES = ["上单", "中单", "打野", "射手", "辅助"]
 
 
-def weighted_win_rate(player):
-    # 低场次保护
-    if player["games"] < 10 and player["win_rate"] > 59.0:
+def weighted_win_rate(player: dict, player_name: str = None, prev_season: dict = None) -> float:
+    """
+    分队用胜率（含低场次保护 + 上赛季回退）：
+
+    新规则：
+    - 若当前 games < 10：
+        - 若上赛季存在该玩家：用上赛季 win_rate
+        - 否则：沿用 41~59 保护规则（基于当前 win_rate）
+    - 若当前 games >= 10：用当前 win_rate
+    """
+    games = int(player.get("games", 0))
+    cur_wr = float(player.get("win_rate", 0.0))
+
+    # >=10 直接用当前赛季数据
+    if games >= 10:
+        return cur_wr
+
+    # <10：优先回退上赛季
+    if prev_season and player_name and player_name in prev_season:
+        try:
+            return float(prev_season[player_name].get("win_rate", cur_wr))
+        except Exception:
+            # 上赛季数据异常则回退到当前规则
+            pass
+
+    # <10 且上赛季无此人：沿用原 41-59 保护
+    if cur_wr > 59.0:
         return 59.0
-    elif player["games"] < 10 and player["win_rate"] < 41.0:
+    if cur_wr < 41.0:
         return 41.0
-    return float(player["win_rate"])
+    return cur_wr
 
 
-def create_balanced_teams(selected_players):
+
+def create_balanced_teams(selected_players, prev_season=None):
     """
     - 两队各5人
     - 每队五个位置(上单/中单/打野/射手/辅助)各1人
     - 只有1个位置的选手必须打该位置
     - 在满足约束的所有方案里，使两队平均胜率差最小
-    - NEW: c罗 和 杰尼龟 不能同队
+    - c罗 和 杰尼龟 不能同队
+    - NEW: games<10 时优先使用上赛季(S4_stats.json)胜率
     """
+    # 若未传入上赛季数据，则这里尝试加载一次（失败就当空）
+    if prev_season is None:
+        try:
+            with open("S4_stats.json", "r", encoding="utf-8") as f:
+                prev_season = json.load(f)
+        except Exception:
+            prev_season = {}
+
     # ---------- config: constraints ----------
     CANT_SAME_TEAM = [("c罗", "杰尼龟")]
 
@@ -38,15 +72,14 @@ def create_balanced_teams(selected_players):
         lanes = list(data.get("lane", []))
         if not lanes:
             lanes = LANES[:]
-        players.append((name, data, weighted_win_rate(data), lanes))
+        eff_wr = weighted_win_rate(data, name, prev_season)  # <-- NEW
+        players.append((name, data, eff_wr, lanes))
 
     if len(players) != 10:
         raise ValueError("selected_players 必须恰好 10 人")
 
-    # 10 slots: (team_id, lane)
     slots = [(1, lane) for lane in LANES] + [(2, lane) for lane in LANES]
 
-    # lane -> candidate player indices
     lane_to_candidates = {lane: [] for lane in LANES}
     for i, (_, _, _, lanes) in enumerate(players):
         for lane in lanes:
@@ -61,13 +94,11 @@ def create_balanced_teams(selected_players):
         _, lane = s
         return len(lane_to_candidates[lane])
 
-    # fill the most constrained lane first
     slots_sorted = sorted(slots, key=slot_key)
 
-    used = [False] * 10              # player index used or not
-    assign = [None] * len(slots_sorted)  # slot idx -> player idx
+    used = [False] * 10
+    assign = [None] * len(slots_sorted)
 
-    # slot -> candidate indices (by lane)
     slot_candidates = []
     for _, lane in slots_sorted:
         cands = []
@@ -76,10 +107,7 @@ def create_balanced_teams(selected_players):
                 cands.append(i)
         slot_candidates.append(cands)
 
-    # quick index->normalized name
     idx_to_norm_name = {i: norm_name(players[i][0]) for i in range(10)}
-
-    # per team current members (normalized names)
     team_members = {1: set(), 2: set()}
 
     def violates_cant_same_team(team_id: int, nm: str) -> bool:
@@ -100,17 +128,13 @@ def create_balanced_teams(selected_players):
         if pos == len(slots_sorted):
             t1_sum = 0.0
             t2_sum = 0.0
-            t1_cnt = 0
-            t2_cnt = 0
             for k, (team_id, _) in enumerate(slots_sorted):
                 pi = assign[k]
                 _, _, wr, _ = players[pi]
                 if team_id == 1:
                     t1_sum += wr
-                    t1_cnt += 1
                 else:
                     t2_sum += wr
-                    t2_cnt += 1
             diff = abs(t1_sum / 5.0 - t2_sum / 5.0)
             if diff < best_diff:
                 best_diff = diff
@@ -124,8 +148,6 @@ def create_balanced_teams(selected_players):
                 continue
 
             nm = idx_to_norm_name[pi]
-
-            # NEW: mutual exclusion rule
             if violates_cant_same_team(team_id, nm):
                 continue
 
@@ -133,7 +155,7 @@ def create_balanced_teams(selected_players):
             assign[pos] = pi
             team_members[team_id].add(nm)
 
-            # pruning: ensure remaining lanes still have at least one unused candidate
+            # pruning
             ok = True
             filled = {(slots_sorted[k][0], slots_sorted[k][1]) for k in range(pos + 1)}
             for (t, l) in slots_sorted[pos + 1:]:
@@ -154,7 +176,7 @@ def create_balanced_teams(selected_players):
     backtrack(0)
 
     if best_assign is None:
-        raise ValueError("无法找到满足“两队各5人且五位置齐全 + 互斥规则”的分配方案")
+        raise ValueError("无法找到满足“两队各5人且五位置齐全 + 互斥规则 + 上赛季回退”的分配方案")
 
     team1, team2 = [], []
     t1_sum, t2_sum = 0.0, 0.0
@@ -169,8 +191,14 @@ def create_balanced_teams(selected_players):
             team2.append((name, data, lane))
             t2_sum += wr
 
-    print("平均胜率:", "Team 1: ", t1_sum / 5.0, ", Team 2: ", t2_sum / 5.0, " | 差值:", abs(t1_sum/5.0 - t2_sum/5.0))
+    print(
+        "平均胜率:",
+        "Team 1:", t1_sum / 5.0,
+        ", Team 2:", t2_sum / 5.0,
+        "| 差值:", abs(t1_sum / 5.0 - t2_sum / 5.0)
+    )
     return team1, team2
+
 
 
 
@@ -572,12 +600,19 @@ class TeamBalancerApp:
             return
 
         selected_players = {
-            self.player_tree.item(i, 'values')[0]: self.players[self.player_tree.item(i, 'values')[0]]
+            self.player_tree.item(i, "values")[0]: self.players[self.player_tree.item(i, "values")[0]]
             for i in selected_items
         }
 
+        # 读取上赛季数据（失败就当空）
         try:
-            team1, team2 = create_balanced_teams(selected_players)
+            with open("S4_stats.json", "r", encoding="utf-8") as f:
+                prev_season = json.load(f)
+        except Exception:
+            prev_season = {}
+
+        try:
+            team1, team2 = create_balanced_teams(selected_players, prev_season=prev_season)
         except Exception as e:
             messagebox.showerror("分队失败", str(e))
             return
@@ -590,18 +625,32 @@ class TeamBalancerApp:
         sorted_team1 = sorted(team1, key=lambda x: positions_order.index(x[2]))
         sorted_team2 = sorted(team2, key=lambda x: positions_order.index(x[2]))
 
-        for player_name, player_data, lane in sorted_team1:
-            self.team1_listbox.insert(
-                tk.END, f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)"
-            )
-        for player_name, player_data, lane in sorted_team2:
-            self.team2_listbox.insert(
-                tk.END, f"{lane}: {player_name}- {player_data['win_rate']}% ({player_data['games']} 场)"
-            )
+        def fmt_player_line(lane, name, data):
+            cur_wr = float(data.get("win_rate", 0.0))
+            games = int(data.get("games", 0))
+            eff_wr = weighted_win_rate(data, name, prev_season)  # 与分队同口径
 
-        # avg winrate labels (use weighted winrate to match balancing logic)
-        t1_avg = sum(weighted_win_rate(d) for _, d, _ in team1) / 5.0
-        t2_avg = sum(weighted_win_rate(d) for _, d, _ in team2) / 5.0
+            # --- UI标记规则 ---
+            tag = ""
+            if games < 10:
+                if name in prev_season:
+                    tag = "*"   # 使用上赛季胜率参与分队
+                else:
+                    tag = "[NEW]"  # 上赛季无此人，走41-59保护
+
+            # 同时显示当前赛季 + 分队口径（带标记）
+            return f"{lane}: {name}- {cur_wr:.2f}% ({games}场{tag})"
+
+
+        for name, data, lane in sorted_team1:
+            self.team1_listbox.insert(tk.END, fmt_player_line(lane, name, data))
+
+        for name, data, lane in sorted_team2:
+            self.team2_listbox.insert(tk.END, fmt_player_line(lane, name, data))
+
+        # avg winrate labels：用有效胜率（与分队一致）
+        t1_avg = sum(weighted_win_rate(d, n, prev_season) for n, d, _ in team1) / 5.0
+        t2_avg = sum(weighted_win_rate(d, n, prev_season) for n, d, _ in team2) / 5.0
         diff = abs(t1_avg - t2_avg)
 
         self.team1_avg_label.config(text=f"平均胜率: {t1_avg:.2f}%")
@@ -609,6 +658,8 @@ class TeamBalancerApp:
         self.diff_label.config(text=f"胜率差值: {diff:.2f}%")
 
         self.update_selected_count()
+
+
 
 
 if __name__ == "__main__":
