@@ -28,7 +28,6 @@ def create_balanced_teams(selected_players):
     CANT_SAME_TEAM = [("c罗", "杰尼龟")]
 
     def norm_name(s: str) -> str:
-        # 轻量规范化：避免前后空格/大小写影响
         return (s or "").strip().lower()
 
     cant_pairs = [(norm_name(a), norm_name(b)) for a, b in CANT_SAME_TEAM]
@@ -192,7 +191,7 @@ def update_player_stats(players, player_name, is_winner):
     player_data["loss"] = loses
 
 
-def load_players_data(filename="S4_stats.json"):
+def load_players_data(filename="S2026_stats.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
             players = json.load(file)
@@ -202,7 +201,7 @@ def load_players_data(filename="S4_stats.json"):
         return None
 
 
-def save_players_data(players, filename="S4_stats.json"):
+def save_players_data(players, filename="S2026_stats.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
 
