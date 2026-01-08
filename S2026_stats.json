@@ -1,27 +1,27 @@
 {
     "c罗": {
-        "win_rate": 18.18,
-        "games": 11,
-        "win": 2,
+        "win_rate": 30.77,
+        "games": 13,
+        "win": 4,
         "loss": 9,
         "lane": [
             "中单"
         ]
     },
     "杰尼龟": {
-        "win_rate": 70.0,
-        "games": 10,
+        "win_rate": 58.33,
+        "games": 12,
         "win": 7,
-        "loss": 3,
+        "loss": 5,
         "lane": [
             "打野",
             "上单"
         ]
     },
     "鸡": {
-        "win_rate": 81.82,
-        "games": 11,
-        "win": 9,
+        "win_rate": 84.62,
+        "games": 13,
+        "win": 11,
         "loss": 2,
         "lane": [
             "辅助",
@@ -49,18 +49,18 @@
         ]
     },
     "左蛋": {
-        "win_rate": 85.71,
-        "games": 7,
-        "win": 6,
+        "win_rate": 88.89,
+        "games": 9,
+        "win": 8,
         "loss": 1,
         "lane": [
             "辅助"
         ]
     },
     "肥大": {
-        "win_rate": 30.0,
-        "games": 10,
-        "win": 3,
+        "win_rate": 41.67,
+        "games": 12,
+        "win": 5,
         "loss": 7,
         "lane": [
             "打野",
@@ -79,8 +79,8 @@
     },
     "嘟嘟": {
         "win_rate": 100.0,
-        "games": 1,
-        "win": 1,
+        "games": 3,
+        "win": 3,
         "loss": 0,
         "lane": [
             "射手",
@@ -98,39 +98,39 @@
         ]
     },
     "木守宫": {
-        "win_rate": 18.18,
-        "games": 11,
+        "win_rate": 15.38,
+        "games": 13,
         "win": 2,
-        "loss": 9,
+        "loss": 11,
         "lane": [
             "上单"
         ]
     },
     "基拉祈": {
-        "win_rate": 80.0,
-        "games": 5,
+        "win_rate": 57.14,
+        "games": 7,
         "win": 4,
-        "loss": 1,
+        "loss": 3,
         "lane": [
             "中单",
             "射手"
         ]
     },
     "香克斯": {
-        "win_rate": 81.82,
-        "games": 11,
+        "win_rate": 69.23,
+        "games": 13,
         "win": 9,
-        "loss": 2,
+        "loss": 4,
         "lane": [
             "射手",
             "辅助"
         ]
     },
     "右蛋": {
-        "win_rate": 0,
-        "games": 0,
+        "win_rate": 0.0,
+        "games": 2,
         "win": 0,
-        "loss": 0,
+        "loss": 2,
         "lane": [
             "射手",
             "辅助"
