@@ -59,7 +59,7 @@ def create_balanced_teams(selected_players, prev_season=None):
             prev_season = {}
 
     # ---------- config: constraints ----------
-    CANT_SAME_TEAM = [("c罗", "杰尼龟")]
+    CANT_SAME_TEAM = [("大师", "惠"), ("c罗", "杰尼龟")]
 
     def norm_name(s: str) -> str:
         return (s or "").strip().lower()
