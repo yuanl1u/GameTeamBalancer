@@ -1,28 +1,28 @@
 {
     "c罗": {
-        "win_rate": 33.33,
-        "games": 27,
-        "win": 9,
-        "loss": 18,
+        "win_rate": 35.48,
+        "games": 31,
+        "win": 11,
+        "loss": 20,
         "lane": [
             "中单"
         ]
     },
     "杰尼龟": {
-        "win_rate": 61.54,
-        "games": 26,
-        "win": 16,
-        "loss": 10,
+        "win_rate": 60.0,
+        "games": 30,
+        "win": 18,
+        "loss": 12,
         "lane": [
             "打野",
             "上单"
         ]
     },
     "鸡": {
-        "win_rate": 81.25,
-        "games": 16,
-        "win": 13,
-        "loss": 3,
+        "win_rate": 78.95,
+        "games": 19,
+        "win": 15,
+        "loss": 4,
         "lane": [
             "辅助",
             "中单",
@@ -30,10 +30,10 @@
         ]
     },
     "小超梦": {
-        "win_rate": 64.29,
-        "games": 14,
-        "win": 9,
-        "loss": 5,
+        "win_rate": 61.11,
+        "games": 18,
+        "win": 11,
+        "loss": 7,
         "lane": [
             "上单"
         ]
@@ -49,29 +49,29 @@
         ]
     },
     "左蛋": {
-        "win_rate": 68.42,
-        "games": 19,
-        "win": 13,
-        "loss": 6,
+        "win_rate": 65.22,
+        "games": 23,
+        "win": 15,
+        "loss": 8,
         "lane": [
             "辅助"
         ]
     },
     "肥大": {
-        "win_rate": 38.46,
-        "games": 26,
-        "win": 10,
-        "loss": 16,
+        "win_rate": 40.0,
+        "games": 30,
+        "win": 12,
+        "loss": 18,
         "lane": [
             "打野",
             "辅助"
         ]
     },
     "波加曼": {
-        "win_rate": 57.14,
-        "games": 14,
+        "win_rate": 53.33,
+        "games": 15,
         "win": 8,
-        "loss": 6,
+        "loss": 7,
         "lane": [
             "打野",
             "射手",
@@ -79,30 +79,30 @@
         ]
     },
     "嘟嘟": {
-        "win_rate": 50.0,
-        "games": 10,
-        "win": 5,
-        "loss": 5,
+        "win_rate": 53.85,
+        "games": 13,
+        "win": 7,
+        "loss": 6,
         "lane": [
             "射手",
             "中单"
         ]
     },
     "豪力给": {
-        "win_rate": 63.64,
-        "games": 22,
-        "win": 14,
-        "loss": 8,
+        "win_rate": 61.54,
+        "games": 26,
+        "win": 16,
+        "loss": 10,
         "lane": [
             "射手",
             "辅助"
         ]
     },
     "木守宫": {
-        "win_rate": 25.93,
-        "games": 27,
-        "win": 7,
-        "loss": 20,
+        "win_rate": 29.03,
+        "games": 31,
+        "win": 9,
+        "loss": 22,
         "lane": [
             "上单"
         ]
@@ -117,10 +117,10 @@
         ]
     },
     "香克斯": {
-        "win_rate": 55.56,
-        "games": 18,
-        "win": 10,
-        "loss": 8,
+        "win_rate": 54.55,
+        "games": 22,
+        "win": 12,
+        "loss": 10,
         "lane": [
             "射手",
             "辅助"
@@ -148,10 +148,10 @@
         ]
     },
     "惠": {
-        "win_rate": 35.0,
-        "games": 20,
+        "win_rate": 33.33,
+        "games": 21,
         "win": 7,
-        "loss": 13,
+        "loss": 14,
         "lane": [
             "辅助"
         ]
