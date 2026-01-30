@@ -33,10 +33,10 @@ def weighted_win_rate(player: dict, player_name: str = None, prev_season: dict =
             pass
 
     # <10 且上赛季无此人：沿用原 41-59 保护
-    if cur_wr > 59.0:
-        return 59.0
-    if cur_wr < 41.0:
-        return 41.0
+    if cur_wr > 65.0:
+        return 65.0
+    if cur_wr < 35.0:
+        return 35.0
     return cur_wr
 
 
