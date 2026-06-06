@@ -1,6 +1,6 @@
 {
     "python.defaultInterpreterPath": "C:\\ProgramData\\anaconda3\\python.exe",
-    "python.terminal.activateEnvironment": false,
     "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python-envs.pythonProjects": []
 }
