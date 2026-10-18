@@ -8,7 +8,7 @@ import pathlib
 LANES = ["上单", "打野", "中单", "射手", "辅助"]
 RULES_FILENAME = "S2026_rules.json"
 MAX_CANT_SAME_PAIRS = 3
-DEFAULT_CANT_SAME_TEAM = [["基拉祈", "惠"], ["鸡", "杰尼龟"]]
+DEFAULT_CANT_SAME_TEAM = [["基拉祈", "惠"], ["鸡", "杰尼龟"], ["基拉祈", "丁宝"]]
 
 
 def weighted_win_rate(player: dict, player_name: str = None, prev_season: dict = None) -> float:
@@ -34,7 +34,7 @@ def weighted_win_rate(player: dict, player_name: str = None, prev_season: dict =
             return float(prev_season[player_name].get("win_rate", cur_wr))
         except Exception:
             # 上赛季数据异常则回退到当前规则
-            pass
+            pass    
 
     # <10 且上赛季无此人：沿用原 41-59 保护
     if cur_wr > 65.0:
