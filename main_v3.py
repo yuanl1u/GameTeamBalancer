@@ -6,8 +6,8 @@ import json
 import pathlib
 
 LANES = ["上单", "打野", "中单", "射手", "辅助"]
-RULES_FILENAME = "S2026_rules.json"
 MAX_CANT_SAME_PAIRS = 3
+# 互斥规则保存在这里；也可以通过界面的“更改规则”更新此列表。
 DEFAULT_CANT_SAME_TEAM = [["基拉祈", "惠"], ["鸡", "杰尼龟"]]
 
 
@@ -69,49 +69,39 @@ def clean_cant_same_team(pairs):
     return cleaned
 
 
-def load_team_rules(filename=RULES_FILENAME):
-    rules = {"cant_same_team": clean_cant_same_team(DEFAULT_CANT_SAME_TEAM)}
-
-    try:
-        with open(filename, "r", encoding="utf-8") as file:
-            saved_rules = json.load(file)
-    except FileNotFoundError:
-        return rules
-    except Exception:
-        return rules
-
-    rules["cant_same_team"] = clean_cant_same_team(
-        saved_rules.get("cant_same_team", rules["cant_same_team"])
-    )
-    return rules
+def load_team_rules():
+    return {"cant_same_team": clean_cant_same_team(DEFAULT_CANT_SAME_TEAM)}
 
 
 def save_default_rules_to_py(cant_same_team):
+    target = pathlib.Path(__file__).resolve()
+    lines = target.read_bytes().decode("utf-8").splitlines(keepends=True)
+    new_line = "DEFAULT_CANT_SAME_TEAM = " + json.dumps(cant_same_team, ensure_ascii=False)
+
+    for idx, line in enumerate(lines):
+        if line.startswith("DEFAULT_CANT_SAME_TEAM = "):
+            ending = line[len(line.rstrip("\r\n")):]
+            lines[idx] = new_line + ending
+            target.write_bytes("".join(lines).encode("utf-8"))
+            return
+
+    raise ValueError("main_v3.py 中未找到 DEFAULT_CANT_SAME_TEAM，无法保存互斥规则")
+
+
+def save_team_rules(rules):
+    global DEFAULT_CANT_SAME_TEAM
+    pairs = clean_cant_same_team(rules.get("cant_same_team", []))
+    save_default_rules_to_py(pairs)
+    DEFAULT_CANT_SAME_TEAM = pairs
+
+
+def load_previous_season_data():
+    filename = pathlib.Path(__file__).resolve().parent / "archive" / "S2026_stats.json"
     try:
-        target = pathlib.Path(__file__)
-        lines = target.read_text(encoding="utf-8").splitlines()
-        new_line = "DEFAULT_CANT_SAME_TEAM = " + json.dumps(cant_same_team, ensure_ascii=False)
-
-        for idx, line in enumerate(lines):
-            if line.startswith("DEFAULT_CANT_SAME_TEAM = "):
-                lines[idx] = new_line
-                target.write_text("\n".join(lines) + "\n", encoding="utf-8")
-                return True
-    except Exception:
-        return False
-
-    return False
-
-
-def save_team_rules(rules, filename=RULES_FILENAME):
-    rules_to_save = {
-        "cant_same_team": clean_cant_same_team(rules.get("cant_same_team", []))
-    }
-
-    with open(filename, "w", encoding="utf-8") as file:
-        json.dump(rules_to_save, file, ensure_ascii=False, indent=4)
-
-    return save_default_rules_to_py(rules_to_save["cant_same_team"])
+        with filename.open("r", encoding="utf-8") as file:
+            return json.load(file)
+    except (OSError, ValueError):
+        return {}
 
 
 def create_balanced_teams(selected_players, prev_season=None, cant_same_team=None):
@@ -121,15 +111,11 @@ def create_balanced_teams(selected_players, prev_season=None, cant_same_team=Non
     - 只有1个位置的选手必须打该位置
     - 在满足约束的所有方案里，使两队平均胜率差最小
     - 指定的互斥玩家不能同队
-    - NEW: games<10 时优先使用上赛季(S4_stats.json)胜率
+    - games<10 时优先使用上赛季(archive/S2026_stats.json)胜率
     """
     # 若未传入上赛季数据，则这里尝试加载一次（失败就当空）
     if prev_season is None:
-        try:
-            with open("S4_stats.json", "r", encoding="utf-8") as f:
-                prev_season = json.load(f)
-        except Exception:
-            prev_season = {}
+        prev_season = load_previous_season_data()
 
     def norm_name(s: str) -> str:
         return (s or "").strip().lower()
@@ -290,7 +276,7 @@ def update_player_stats(players, player_name, is_winner):
     player_data["loss"] = loses
 
 
-def load_players_data(filename="S2026_stats.json"):
+def load_players_data(filename="S2026_stats2.json"):
     try:
         with open(filename, "r", encoding="utf-8") as file:
             players = json.load(file)
@@ -300,7 +286,7 @@ def load_players_data(filename="S2026_stats.json"):
         return None
 
 
-def save_players_data(players, filename="S2026_stats.json"):
+def save_players_data(players, filename="S2026_stats2.json"):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(players, file, ensure_ascii=False, indent=4)
 
@@ -680,7 +666,6 @@ class TeamBalancerApp:
 
         try:
             save_players_data(self.players)
-            save_team_rules(self.rules)
         except Exception as e:
             messagebox.showerror("保存失败", str(e), parent=self.root)
             return
@@ -877,18 +862,18 @@ class TeamBalancerApp:
         for player_name, lane_vars in self.rule_lane_vars.items():
             self.players[player_name]["lane"] = [lane for lane in LANES if lane_vars[lane].get()]
 
-        self.rules["cant_same_team"] = clean_cant_same_team(pairs)
+        pairs = clean_cant_same_team(pairs)
 
         try:
             save_players_data(self.players)
-            saved_to_py = save_team_rules(self.rules)
+            if pairs != self.rules.get("cant_same_team", []):
+                save_team_rules({"cant_same_team": pairs})
         except Exception as e:
             messagebox.showerror("保存失败", str(e), parent=window)
             return False
 
+        self.rules["cant_same_team"] = pairs
         self.populate_player_tree()
-        if not saved_to_py:
-            messagebox.showwarning("保存提醒", "规则已保存到 JSON，但没有成功同步写入 main_v3.py", parent=window)
 
         if destroy_window and window.winfo_exists():
             window.destroy()
@@ -1040,11 +1025,7 @@ class TeamBalancerApp:
         }
 
         # 读取上赛季数据（失败就当空）
-        try:
-            with open("S4_stats.json", "r", encoding="utf-8") as f:
-                prev_season = json.load(f)
-        except Exception:
-            prev_season = {}
+        prev_season = load_previous_season_data()
 
         try:
             team1, team2 = create_balanced_teams(
