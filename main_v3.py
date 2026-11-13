@@ -8,7 +8,7 @@ import pathlib
 LANES = ["上单", "打野", "中单", "射手", "辅助"]
 MAX_CANT_SAME_PAIRS = 3
 # 互斥规则保存在这里；也可以通过界面的“更改规则”更新此列表。
-DEFAULT_CANT_SAME_TEAM = [["杰尼龟", "鸡"]]
+DEFAULT_CANT_SAME_TEAM = []
 
 
 def weighted_win_rate(player: dict, player_name: str = None, prev_season: dict = None) -> float:
