@@ -20,28 +20,28 @@
         ]
     },
     "小鸡": {
-        "win_rate": 42.55,
-        "games": 47,
-        "win": 20,
+        "win_rate": 44.9,
+        "games": 49,
+        "win": 22,
         "loss": 27,
         "lane": [
             "打野"
         ]
     },
     "小超梦": {
-        "win_rate": 58.62,
-        "games": 29,
+        "win_rate": 54.84,
+        "games": 31,
         "win": 17,
-        "loss": 12,
+        "loss": 14,
         "lane": [
             "上单"
         ]
     },
     "老头": {
-        "win_rate": 69.05,
-        "games": 42,
+        "win_rate": 65.91,
+        "games": 44,
         "win": 29,
-        "loss": 13,
+        "loss": 15,
         "lane": [
             "上单",
             "打野",
@@ -50,27 +50,27 @@
         ]
     },
     "左蛋": {
-        "win_rate": 61.54,
-        "games": 39,
-        "win": 24,
+        "win_rate": 63.41,
+        "games": 41,
+        "win": 26,
         "loss": 15,
         "lane": [
             "辅助"
         ]
     },
     "大快龙": {
-        "win_rate": 53.49,
-        "games": 43,
+        "win_rate": 51.11,
+        "games": 45,
         "win": 23,
-        "loss": 20,
+        "loss": 22,
         "lane": [
             "打野"
         ]
     },
     "波加曼": {
-        "win_rate": 55.56,
-        "games": 27,
-        "win": 15,
+        "win_rate": 58.62,
+        "games": 29,
+        "win": 17,
         "loss": 12,
         "lane": [
             "打野",
@@ -90,18 +90,18 @@
         ]
     },
     "豪力给": {
-        "win_rate": 54.1,
-        "games": 61,
-        "win": 33,
+        "win_rate": 55.56,
+        "games": 63,
+        "win": 35,
         "loss": 28,
         "lane": [
             "射手"
         ]
     },
     "木守宫": {
-        "win_rate": 45.31,
-        "games": 64,
-        "win": 29,
+        "win_rate": 46.97,
+        "games": 66,
+        "win": 31,
         "loss": 35,
         "lane": [
             "上单"
@@ -118,10 +118,10 @@
         ]
     },
     "xmm": {
-        "win_rate": 50.0,
-        "games": 26,
+        "win_rate": 46.43,
+        "games": 28,
         "win": 13,
-        "loss": 13,
+        "loss": 15,
         "lane": [
             "射手",
             "辅助"
@@ -176,10 +176,10 @@
         ]
     },
     "robinson": {
-        "win_rate": 28.57,
-        "games": 14,
+        "win_rate": 25.0,
+        "games": 16,
         "win": 4,
-        "loss": 10,
+        "loss": 12,
         "lane": [
             "中单"
         ]
